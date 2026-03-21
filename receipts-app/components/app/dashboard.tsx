@@ -22,7 +22,7 @@ export async function Dashboard() {
               Catch the day, then read it back later.
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-8 text-zinc-400">
-              `/app` is now the place to capture quickly and see the freshest movement in your notebook, not a half-finished dashboard trying to do everything.
+              Capture something quickly, then see the freshest movement in your notebook without leaving home base.
             </p>
           </div>
 
