@@ -57,16 +57,18 @@ export async function generateInsights() {
   }
 
   const client = createOpenAiClient();
-  const prompt = `You are the insight engine for a product called Receipts.
-Your job is to generate sharp, evidence-based observations from a user's own notes.
+  const prompt = `You write private-feeling weekly notes for a product called Receipts.
+The result should feel memorable, diary-like, and emotionally intelligent without becoming corny.
+It should sound like a close observer who paid attention all week.
 
 STYLE RULES:
-- Sound perceptive, specific, and slightly forensic.
-- Do NOT sound like a therapist, life coach, or generic productivity blog.
-- Do NOT repeat the user's words unless needed for evidence.
-- Prefer concrete behavioral interpretation over vague emotional summaries.
-- If the evidence is weak, lower confidence instead of overclaiming.
-- Every insight must point to actual entries that support it.
+- Write with warmth, specificity, and a little bite.
+- Do not sound clinical, corporate, or like a motivational coach.
+- Make the user feel seen.
+- Use vivid phrasing when the evidence supports it.
+- Avoid generic lines like "stress impacted your productivity" unless you make them concrete.
+- The writing can be reflective, but it must stay grounded in evidence.
+- If evidence is weak, say less and lower confidence.
 
 OUTPUT RULES:
 Return valid JSON only with this exact shape:
@@ -74,8 +76,8 @@ Return valid JSON only with this exact shape:
   "insights": [
     {
       "type": "pattern | contradiction | weekly_receipt",
-      "title": "short sharp title",
-      "body": "2-4 sentences. Explain the pattern in a way that feels specific and useful.",
+      "title": "memorable but concise",
+      "body": "2-4 sentences, written more like a private note than a dashboard bullet",
       "confidence": "low | medium | high",
       "evidence_entry_ids": ["entry-id-1", "entry-id-2"]
     }
@@ -83,12 +85,13 @@ Return valid JSON only with this exact shape:
 }
 
 QUALITY BAR:
-- A PATTERN should describe a repeated link between trigger and behavior.
-- A CONTRADICTION should highlight mismatch between what the user says and what their behavior suggests.
-- A WEEKLY_RECEIPT should summarize the strongest loop or pattern shaping the recent period.
-- Avoid generic lines like "stress affects productivity" unless the evidence is unusually strong and phrased specifically.
+- PATTERN: show a repeated trigger → behavior loop.
+- CONTRADICTION: show where the user's self-story and actual behavior diverged.
+- WEEKLY_RECEIPT: write like a short weekly letter, not a summary bullet.
 - Use at most 3 insights total.
-- If a requested type is not supported by evidence, skip it.
+- Skip any type that is not well-supported.
+- Never invent evidence.
+- Prefer fewer, stronger insights over many weak ones.
 
 USER ENTRIES:
 ${JSON.stringify(entries, null, 2)}`;

@@ -3,6 +3,7 @@ import { BrainCircuit, Plus, Sparkles } from "lucide-react";
 import { EntryForm } from "@/components/app/entry-form";
 import { InsightCard } from "@/components/insights/insight-card";
 import { getDashboardData } from "@/lib/dashboard";
+import { getEvidenceSnippets } from "@/lib/insights";
 
 function moodLabel(score: number) {
   return ["Very low", "Low", "Neutral", "Good", "Great"][score - 1] ?? "Unknown";
@@ -11,6 +12,8 @@ function moodLabel(score: number) {
 export async function Dashboard() {
   const { entries: recentEntries, insights, dominantTheme } = await getDashboardData();
   const latestInsights = insights.slice(0, 3);
+  const evidenceIds = [...new Set(latestInsights.flatMap((insight) => insight.evidence))];
+  const evidenceMap = await getEvidenceSnippets(evidenceIds);
 
   return (
     <section className="space-y-6">
@@ -22,7 +25,7 @@ export async function Dashboard() {
               Your week, under intelligent review.
             </h1>
             <p className="mt-3 max-w-2xl text-zinc-400">
-              Capture the raw material fast, then let Receipts turn it into patterns, contradictions, and receipts that feel specific enough to sting a little.
+              Capture the raw material fast, then let Receipts turn it into something that reads more like a private note than a productivity dashboard.
             </p>
           </div>
 
@@ -60,14 +63,14 @@ export async function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Latest receipts</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Patterns worth paying attention to</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-white">What your week kept trying to say</h2>
               </div>
               <BrainCircuit className="h-5 w-5 text-amber-300" />
             </div>
 
             <div className="mt-6 space-y-4">
               {latestInsights.length > 0 ? (
-                latestInsights.map((insight) => <InsightCard key={insight.id} insight={insight} />)
+                latestInsights.map((insight) => <InsightCard key={insight.id} insight={insight} evidenceMap={evidenceMap} />)
               ) : (
                 <div className="rounded-3xl border border-white/10 bg-black/20 p-5 text-zinc-400">
                   No saved insights yet. Add a few entries, then head to the insights page and generate them.

@@ -1,14 +1,26 @@
-import type { InsightRecord } from "@/lib/insights";
+import type { EvidenceSnippet, InsightRecord } from "@/lib/insights";
 
 const labels: Record<string, string> = {
-  pattern: "Pattern",
-  contradiction: "Contradiction",
-  weekly_receipt: "Weekly receipt",
+  pattern: "Pattern noticed",
+  contradiction: "What didn't match",
+  weekly_receipt: "This week's note",
 };
 
-export function InsightCard({ insight }: { insight: InsightRecord }) {
+const intros: Record<string, string> = {
+  pattern: "A thread that kept showing up:",
+  contradiction: "Something your week kept revealing:",
+  weekly_receipt: "If this week had to confess something, it would probably say this:",
+};
+
+export function InsightCard({
+  insight,
+  evidenceMap,
+}: {
+  insight: InsightRecord;
+  evidenceMap?: Record<string, EvidenceSnippet>;
+}) {
   return (
-    <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <article className="rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/8 to-white/[0.03] p-6">
       <div className="flex flex-wrap items-center gap-3">
         <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-amber-200">
           {labels[insight.type] ?? insight.type}
@@ -20,11 +32,34 @@ export function InsightCard({ insight }: { insight: InsightRecord }) {
           </span>
         ) : null}
       </div>
-      <h2 className="mt-4 text-2xl font-semibold text-white">{insight.title}</h2>
-      <p className="mt-3 max-w-3xl leading-7 text-zinc-400">{insight.body}</p>
-      <p className="mt-4 text-sm text-zinc-500">
-        Evidence: {insight.evidence.length > 0 ? insight.evidence.join(", ") : "No linked entries yet"}
-      </p>
+
+      <p className="mt-5 text-sm italic leading-6 text-zinc-500">{intros[insight.type] ?? "What your entries suggest:"}</p>
+      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">{insight.title}</h2>
+      <p className="mt-4 max-w-3xl whitespace-pre-line text-[15px] leading-8 text-zinc-300">{insight.body}</p>
+
+      <details className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+        <summary className="cursor-pointer list-none text-sm font-medium text-zinc-300">
+          Open the receipts underneath
+        </summary>
+        <div className="mt-4 space-y-3">
+          {insight.evidence.length > 0 ? (
+            insight.evidence.map((entryId) => {
+              const evidence = evidenceMap?.[entryId];
+              return (
+                <div key={entryId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-medium text-white">{evidence?.title ?? entryId}</p>
+                    <span className="text-xs text-zinc-500">{evidence?.createdAt ?? "linked entry"}</span>
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence?.content ?? "Entry snippet unavailable."}</p>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-zinc-500">No linked entries yet.</p>
+          )}
+        </div>
+      </details>
     </article>
   );
 }

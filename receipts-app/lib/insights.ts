@@ -12,6 +12,13 @@ export type InsightRecord = {
   createdAt?: string;
 };
 
+export type EvidenceSnippet = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+};
+
 export async function getInsights(): Promise<InsightRecord[]> {
   if (!hasSupabaseEnv()) {
     return insightCards.map((card) => ({
@@ -55,4 +62,37 @@ export async function getInsights(): Promise<InsightRecord[]> {
       : [],
     createdAt: item.created_at,
   }));
+}
+
+export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<string, EvidenceSnippet>> {
+  if (!hasSupabaseEnv() || entryIds.length === 0) {
+    return {};
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("entries")
+    .select("id, title, content, created_at")
+    .in("id", entryIds);
+
+  if (error || !data) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    data.map((entry) => [
+      entry.id,
+      {
+        id: entry.id,
+        title: entry.title || "Untitled entry",
+        content: entry.content,
+        createdAt: new Date(entry.created_at).toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+      },
+    ]),
+  );
 }
