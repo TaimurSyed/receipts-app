@@ -1,0 +1,131 @@
+import { hasSupabaseEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
+import type { EvidenceSnippet, InsightRecord } from "@/lib/insights";
+
+export type JournalDay = {
+  date: string;
+  displayDate: string;
+  entries: EvidenceSnippet[];
+};
+
+export type JournalWeek = {
+  key: string;
+  label: string;
+  startDate: string;
+  endDate: string;
+  days: JournalDay[];
+};
+
+function startOfWeek(date: Date) {
+  const copy = new Date(date);
+  const day = copy.getDay();
+  const diff = (day + 6) % 7;
+  copy.setDate(copy.getDate() - diff);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function endOfWeek(date: Date) {
+  const copy = startOfWeek(date);
+  copy.setDate(copy.getDate() + 6);
+  copy.setHours(23, 59, 59, 999);
+  return copy;
+}
+
+function formatDate(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatRangeLabel(start: Date, end: Date) {
+  return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+}
+
+export async function getJournalWeeks(): Promise<JournalWeek[]> {
+  if (!hasSupabaseEnv()) {
+    return [];
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("entries")
+    .select("id, title, content, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(120);
+
+  if (error || !data) {
+    return [];
+  }
+
+  const weekMap = new Map<string, JournalWeek>();
+
+  for (const entry of data) {
+    const created = new Date(entry.created_at);
+    const weekStart = startOfWeek(created);
+    const weekEnd = endOfWeek(created);
+    const weekKey = formatDate(weekStart);
+    const dayKey = formatDate(created);
+
+    if (!weekMap.has(weekKey)) {
+      weekMap.set(weekKey, {
+        key: weekKey,
+        label: formatRangeLabel(weekStart, weekEnd),
+        startDate: weekKey,
+        endDate: formatDate(weekEnd),
+        days: [],
+      });
+    }
+
+    const week = weekMap.get(weekKey)!;
+    let day = week.days.find((item) => item.date === dayKey);
+
+    if (!day) {
+      day = {
+        date: dayKey,
+        displayDate: created.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        }),
+        entries: [],
+      };
+      week.days.push(day);
+    }
+
+    day.entries.push({
+      id: entry.id,
+      title: entry.title || "Untitled entry",
+      content: entry.content,
+      createdAt: created.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+    });
+  }
+
+  return [...weekMap.values()].map((week) => ({
+    ...week,
+    days: week.days.sort((a, b) => (a.date < b.date ? 1 : -1)),
+  }));
+}
+
+export function getWeekInsights(insights: InsightRecord[], weekKey?: string) {
+  if (!weekKey) {
+    return insights;
+  }
+
+  return insights.filter((insight) => {
+    if (!insight.createdAt) return true;
+    return formatDate(startOfWeek(new Date(insight.createdAt))) === weekKey;
+  });
+}
