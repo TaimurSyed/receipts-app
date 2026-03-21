@@ -5,6 +5,28 @@ import { hasOpenAiKey, createOpenAiClient } from "@/lib/ai";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/env";
 
+function extractJsonObject(text: string) {
+  const trimmed = text.trim();
+
+  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+    return trimmed;
+  }
+
+  const codeBlockMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (codeBlockMatch?.[1]) {
+    return codeBlockMatch[1].trim();
+  }
+
+  const firstBrace = trimmed.indexOf("{");
+  const lastBrace = trimmed.lastIndexOf("}");
+
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    return trimmed.slice(firstBrace, lastBrace + 1);
+  }
+
+  return trimmed;
+}
+
 export async function generateInsights() {
   if (!hasSupabaseEnv()) {
     return { ok: false, message: "Supabase is not configured." };
@@ -35,16 +57,37 @@ export async function generateInsights() {
   }
 
   const client = createOpenAiClient();
-  const prompt = `You are generating concise self-insight cards for a journaling app. Based only on the evidence provided, create up to 3 insights: one pattern, one contradiction, and one weekly_receipt. Return JSON only with an array called insights. Each insight must have: type, title, body, confidence (low|medium|high), evidence_entry_ids.
+  const prompt = `You are generating concise self-insight cards for a journaling app.
+Based only on the evidence provided, create up to 3 insights: one pattern, one contradiction, and one weekly_receipt.
+Return JSON only with this shape:
+{
+  "insights": [
+    {
+      "type": "pattern | contradiction | weekly_receipt",
+      "title": "short title",
+      "body": "2-4 sentence explanation grounded in the evidence",
+      "confidence": "low | medium | high",
+      "evidence_entry_ids": ["entry-id"]
+    }
+  ]
+}
+Do not use markdown fences. Do not include commentary outside JSON.
 
 Entries:\n${JSON.stringify(entries, null, 2)}`;
 
-  const response = await client.responses.create({
-    model: "gpt-4.1-mini",
-    input: prompt,
-  });
+  let text = "";
 
-  const text = response.output_text;
+  try {
+    const response = await client.responses.create({
+      model: "gpt-4.1-mini",
+      input: prompt,
+    });
+
+    text = response.output_text;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "OpenAI request failed.";
+    return { ok: false, message };
+  }
 
   let parsed: {
     insights: Array<{
@@ -57,9 +100,12 @@ Entries:\n${JSON.stringify(entries, null, 2)}`;
   };
 
   try {
-    parsed = JSON.parse(text);
+    parsed = JSON.parse(extractJsonObject(text));
   } catch {
-    return { ok: false, message: "The AI response could not be parsed." };
+    return {
+      ok: false,
+      message: `The AI response could not be parsed. Raw response: ${text.slice(0, 220) || "(empty)"}`,
+    };
   }
 
   const insights = parsed.insights?.slice(0, 3) ?? [];
@@ -87,5 +133,5 @@ Entries:\n${JSON.stringify(entries, null, 2)}`;
 
   revalidatePath("/insights");
   revalidatePath("/app");
-  return { ok: true, message: "Insights generated." };
+  return { ok: true, message: `Generated ${insights.length} insights.` };
 }
