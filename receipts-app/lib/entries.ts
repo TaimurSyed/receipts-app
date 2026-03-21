@@ -10,6 +10,7 @@ export type TimelineEntry = {
   tags: string[];
   time: string;
   usedInInsight: boolean;
+  archived?: boolean;
 };
 
 export async function getEntries(): Promise<TimelineEntry[]> {
@@ -28,8 +29,9 @@ export async function getEntries(): Promise<TimelineEntry[]> {
 
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, content, mood_score, tags, created_at")
+    .select("id, title, content, mood_score, tags, created_at, archived")
     .eq("user_id", user.id)
+    .eq("archived", false)
     .order("created_at", { ascending: false })
     .limit(8);
 
@@ -50,5 +52,6 @@ export async function getEntries(): Promise<TimelineEntry[]> {
       minute: "2-digit",
     }),
     usedInInsight: false,
+    archived: entry.archived ?? false,
   }));
 }

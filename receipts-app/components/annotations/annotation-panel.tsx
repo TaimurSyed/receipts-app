@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 import { createAnnotation } from "@/app/annotations/actions";
 import type { PageAnnotation } from "@/lib/annotations";
+import { AnnotationDeleteButton } from "@/components/annotations/annotation-delete-button";
 
 export type ActionState = {
   ok: boolean;
@@ -58,9 +59,16 @@ export function AnnotationPanel({
         {annotations.length > 0 ? (
           annotations.map((annotation) => (
             <article key={annotation.id} className={`rounded-2xl border p-4 ${annotation.author === "ai" ? "border-[#6a5847] bg-[#191613]" : "border-[#4f4338] bg-[#110f0d]"}`}>
-              <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">{annotation.author === "ai" ? "Notebook reply" : "Your note"}</p>
-              <p className="mt-2 whitespace-pre-line text-sm leading-7 text-zinc-300">{annotation.body}</p>
-              <p className="mt-3 text-xs text-zinc-500">{annotation.createdAt}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">{annotation.author === "ai" ? "Notebook reply" : "Your note"}</p>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-7 text-zinc-300">{annotation.body}</p>
+                  <p className="mt-3 text-xs text-zinc-500">{annotation.createdAt}</p>
+                </div>
+                {annotation.author === "user" ? (
+                  <AnnotationDeleteButton annotationId={annotation.id} pageType={pageType} pageKey={pageKey} />
+                ) : null}
+              </div>
             </article>
           ))
         ) : (

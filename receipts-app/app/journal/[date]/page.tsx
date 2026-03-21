@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AnnotationPanel } from "@/components/annotations/annotation-panel";
 import { DayEntryForm } from "@/components/journal/day-entry-form";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
+import { EntryActionsMenu } from "@/components/journal/entry-actions-menu";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageTurnNav } from "@/components/journal/page-turn-nav";
 import { getAnnotations } from "@/lib/annotations";
@@ -28,8 +29,9 @@ export default async function JournalDayPage({ params }: PageProps) {
   const end = `${date}T23:59:59.999Z`;
   const { data: entries } = await supabase
     .from("entries")
-    .select("id, title, content, created_at, mood_score, tags")
+    .select("id, title, content, created_at, mood_score, tags, archived")
     .eq("user_id", user.id)
+    .eq("archived", false)
     .gte("created_at", start)
     .lte("created_at", end)
     .order("created_at", { ascending: true });
@@ -84,8 +86,9 @@ export default async function JournalDayPage({ params }: PageProps) {
                       <h2 className="text-xl font-semibold text-[#f1e7d4]">{entry.title || "Untitled entry"}</h2>
                       <p className="mt-1 text-sm text-zinc-500">{new Date(entry.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</p>
                     </div>
-                    <span className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-400">Mood {entry.mood_score ?? 3}/5</span>
+                    <EntryActionsMenu entryId={entry.id} date={date} />
                   </div>
+                  <div className="mt-3"><span className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-400">Mood {entry.mood_score ?? 3}/5</span></div>
                   <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
                   {entry.tags?.length ? <div className="mt-4 flex flex-wrap gap-2">{entry.tags.map((tag: string) => <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>)}</div> : null}
                 </article>
