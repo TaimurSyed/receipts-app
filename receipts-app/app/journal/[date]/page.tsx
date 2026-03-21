@@ -51,11 +51,11 @@ export default async function JournalDayPage({ params }: PageProps) {
 
   return (
     <NotebookShell archive={archive} selectedDate={date}>
-      <div className="rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 shadow-panel">
-        <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="notebook-page-edge notebook-paper rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 lg:p-10">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Daily page</p>
-            <h1 className="mt-2 font-serif text-5xl text-[#f5ecd8]">{displayDate}</h1>
+            <h1 className="mt-3 font-serif text-4xl text-[#f5ecd8] sm:text-5xl">{displayDate}</h1>
           </div>
           <Link href="/insights" className="rounded-full border border-[#5a4b3f] bg-[#1a1714] px-4 py-2 text-sm font-semibold text-[#f1e7d4]">Back to journal</Link>
         </div>
@@ -72,7 +72,7 @@ export default async function JournalDayPage({ params }: PageProps) {
             />
           </div>
 
-          <section className="rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#181410_0%,#11100f_100%)] p-6 sm:p-8 shadow-panel">
+          <section className="notebook-page-edge rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#181410_0%,#11100f_100%)] p-6 sm:p-8">
             <div className="border-b border-[#5e503f]/40 pb-5">
               <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts from the day</p>
               <p className="mt-3 text-sm leading-7 text-zinc-400">The raw notes are still here underneath the interpretation.</p>
@@ -80,7 +80,7 @@ export default async function JournalDayPage({ params }: PageProps) {
 
             <div className="mt-8 space-y-5">
               {entries && entries.length > 0 ? entries.map((entry) => (
-                <article key={entry.id} className="rounded-[1.5rem] border border-[#4f4338] bg-[#15120f] p-5">
+                <article key={entry.id} className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-xl font-semibold text-[#f1e7d4]">{entry.title || "Untitled entry"}</h2>
@@ -89,10 +89,10 @@ export default async function JournalDayPage({ params }: PageProps) {
                     <EntryActionsMenu entryId={entry.id} date={date} />
                   </div>
                   <div className="mt-3"><span className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-400">Mood {entry.mood_score ?? 3}/5</span></div>
-                  <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
-                  {entry.tags?.length ? <div className="mt-4 flex flex-wrap gap-2">{entry.tags.map((tag: string) => <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>)}</div> : null}
+                  <p className="mt-5 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
+                  {entry.tags?.length ? <div className="mt-5 flex flex-wrap gap-2">{entry.tags.map((tag: string) => <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>)}</div> : null}
                 </article>
-              )) : <div className="rounded-[1.5rem] border border-[#4f4338] bg-[#15120f] p-5 text-zinc-400">No entries were saved for this day yet.</div>}
+              )) : <div className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5 text-zinc-400">No entries were saved for this day yet.</div>}
             </div>
 
             <PageTurnNav

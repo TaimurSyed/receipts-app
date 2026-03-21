@@ -20,7 +20,7 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
   if (!monthRecord) {
     return (
       <NotebookShell archive={archive}>
-        <div className="rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-8 text-zinc-400 shadow-panel">
+        <div className="notebook-page-edge rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-8 text-zinc-400 shadow-panel">
           Month not found.
         </div>
       </NotebookShell>
@@ -31,19 +31,19 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
 
   return (
     <NotebookShell archive={archive}>
-      <div className="rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 shadow-panel">
+      <div className="notebook-page-edge notebook-paper rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 lg:p-10 shadow-panel">
         <div className="border-b border-[#5e503f]/40 pb-6">
           <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Month view</p>
-          <h1 className="mt-3 font-serif text-5xl text-[#f5ecd8]">{monthRecord.label} {monthRecord.year}</h1>
-          <p className="mt-3 text-zinc-400">A calendar spread for the pages that exist in this month.</p>
+          <h1 className="mt-3 font-serif text-5xl text-[#f5ecd8] sm:text-6xl">{monthRecord.label} {monthRecord.year}</h1>
+          <p className="mt-4 max-w-2xl text-[15px] leading-8 text-zinc-400">A calendar spread for the pages that exist in this month.</p>
         </div>
 
         {addDate ? (
-          <div className="mt-8 rounded-[2rem] border border-[#4f4338] bg-[#15120f] p-5">
+          <div className="mt-8 rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-5">
             <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#5e503f]/30 pb-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Quick add</p>
-                <h2 className="mt-2 font-serif text-2xl text-[#f1e7d4]">
+                <h2 className="mt-2 font-serif text-2xl text-[#f1e7d4] sm:text-3xl">
                   Add a note to {new Date(`${addDate}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </h2>
               </div>
@@ -55,7 +55,7 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
           </div>
         ) : null}
 
-        <div className="mt-8 rounded-[2rem] border border-[#4f4338] bg-[#15120f] p-4 sm:p-5">
+        <div className="mt-8 rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-4 sm:p-5">
           <div className="grid grid-cols-7 gap-2 border-b border-[#5e503f]/30 pb-3 text-center text-xs uppercase tracking-[0.24em] text-zinc-500">
             {weekdayLabels.map((label) => (
               <div key={label}>{label}</div>
@@ -66,11 +66,11 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
             {grid.map((cell) => (
               <div
                 key={cell.date}
-                className={`min-h-24 rounded-2xl border p-3 ${
+                className={`min-h-28 rounded-2xl border p-3 sm:min-h-32 ${
                   cell.inMonth
-                    ? "border-[#4f4338] bg-[#110f0d]"
+                    ? "border-[#4f4338] bg-[#110f0d]/90"
                     : "border-[#352d26] bg-[#0d0b09] text-zinc-600"
-                } ${cell.hasEntries ? "ring-1 ring-[#dbc59b]/20" : ""}`}
+                } ${cell.hasEntries ? "ring-1 ring-[#dbc59b]/20 shadow-sm" : ""}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className={`text-sm font-semibold ${cell.inMonth ? "text-[#f1e7d4]" : "text-zinc-600"}`}>{cell.dayNumber}</span>
@@ -83,7 +83,7 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-8 flex flex-col gap-1 text-xs">
+                <div className="mt-10 flex flex-col gap-1 text-xs sm:mt-12">
                   {cell.hasEntries ? (
                     <Link href={`/journal/${cell.date}`} className="text-zinc-500 transition hover:text-zinc-200">
                       Open page
@@ -97,9 +97,9 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           {monthRecord.weeks.map((week) => (
-            <section key={week.key} className="rounded-[2rem] border border-[#4f4338] bg-[#15120f] p-5">
+            <section key={week.key} className="rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Week spread</p>
