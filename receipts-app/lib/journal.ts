@@ -29,6 +29,13 @@ export type JournalYear = {
   months: JournalMonth[];
 };
 
+export type MonthGridCell = {
+  date: string;
+  dayNumber: number;
+  inMonth: boolean;
+  hasEntries: boolean;
+};
+
 function startOfWeek(date: Date) {
   const copy = new Date(date);
   const day = copy.getDay();
@@ -166,4 +173,28 @@ export function getWeekInsights(insights: InsightRecord[], weekKey?: string) {
     if (!insight.createdAt) return true;
     return formatDate(startOfWeek(new Date(insight.createdAt))) === weekKey;
   });
+}
+
+export function buildMonthGrid(month: JournalMonth): MonthGridCell[] {
+  const firstDay = new Date(Date.UTC(month.year, month.month, 1));
+  const lastDay = new Date(Date.UTC(month.year, month.month + 1, 0));
+  const gridStart = startOfWeek(firstDay);
+  const gridEnd = endOfWeek(lastDay);
+  const datesWithEntries = new Set(month.weeks.flatMap((week) => week.days.map((day) => day.date)));
+
+  const cells: MonthGridCell[] = [];
+  const cursor = new Date(gridStart);
+
+  while (cursor <= gridEnd) {
+    const date = formatDate(cursor);
+    cells.push({
+      date,
+      dayNumber: cursor.getUTCDate(),
+      inMonth: cursor.getUTCMonth() === month.month,
+      hasEntries: datesWithEntries.has(date),
+    });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return cells;
 }
