@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { AnnotationPanel } from "@/components/annotations/annotation-panel";
+import { ImageNote } from "@/components/app/image-note";
+import { VoicePlayback } from "@/components/app/voice-playback";
 import { DayEntryForm } from "@/components/journal/day-entry-form";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
 import { EntryActionsMenu } from "@/components/journal/entry-actions-menu";
@@ -7,6 +9,7 @@ import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageTurnNav } from "@/components/journal/page-turn-nav";
 import { getAnnotations } from "@/lib/annotations";
 import { getDailyReflection } from "@/lib/daily-reflection";
+import { getImagePlaybackUrl, getVoicePlaybackUrl } from "@/lib/entries";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getJournalArchive } from "@/lib/journal";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +32,7 @@ export default async function JournalDayPage({ params }: PageProps) {
   const end = `${date}T23:59:59.999Z`;
   const { data: entries } = await supabase
     .from("entries")
-    .select("id, title, content, created_at, mood_score, tags, archived")
+    .select("id, title, content, created_at, mood_score, tags, archived, type, audio_path, image_path")
     .eq("user_id", user.id)
     .eq("archived", false)
     .gte("created_at", start)
@@ -42,6 +45,13 @@ export default async function JournalDayPage({ params }: PageProps) {
   const currentIndex = flatDays.findIndex((day) => day.date === date);
   const previousDay = currentIndex > 0 ? flatDays[currentIndex - 1] : undefined;
   const nextDay = currentIndex >= 0 && currentIndex < flatDays.length - 1 ? flatDays[currentIndex + 1] : undefined;
+
+  const playbackUrls = Object.fromEntries(
+    await Promise.all((entries ?? []).map(async (entry) => [entry.id, await getVoicePlaybackUrl(entry.audio_path)] as const)),
+  );
+  const imageUrls = Object.fromEntries(
+    await Promise.all((entries ?? []).map(async (entry) => [entry.id, await getImagePlaybackUrl(entry.image_path)] as const)),
+  );
 
   const displayDate = new Date(`${date}T12:00:00`).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
@@ -90,6 +100,8 @@ export default async function JournalDayPage({ params }: PageProps) {
                   </div>
                   <div className="mt-3"><span className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-400">Mood {entry.mood_score ?? 3}/5</span></div>
                   <p className="mt-5 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
+                  {entry.type === "voice" && playbackUrls[entry.id] ? <VoicePlayback url={playbackUrls[entry.id] as string} /> : null}
+                  {entry.type === "image" && imageUrls[entry.id] ? <ImageNote url={imageUrls[entry.id] as string} /> : null}
                   {entry.tags?.length ? <div className="mt-5 flex flex-wrap gap-2">{entry.tags.map((tag: string) => <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>)}</div> : null}
                 </article>
               )) : <div className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5 text-zinc-400">No entries were saved for this day yet.</div>}
