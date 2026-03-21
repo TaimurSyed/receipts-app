@@ -9,11 +9,11 @@ type Props = {
 
 export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) {
   return (
-    <aside className="rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#100e0c_100%)] p-5 shadow-panel">
+    <aside className="notebook-page-edge sticky top-6 rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#17130f_0%,#100d0b_100%)] p-5">
       <div className="border-b border-[#5e503f]/40 pb-4">
         <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Notebook</p>
         <h2 className="mt-3 font-serif text-3xl text-[#f5ecd8]">Archive</h2>
-        <p className="mt-2 text-sm text-zinc-500">Years, months, weeks, and pages.</p>
+        <p className="mt-2 text-sm leading-6 text-zinc-500">Years, months, weeks, and pages.</p>
       </div>
 
       <div className="mt-4">
@@ -22,7 +22,7 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
         </Link>
       </div>
 
-      <div className="mt-5 space-y-5">
+      <div className="mt-5 space-y-5 max-h-[75vh] overflow-auto pr-1">
         {archive.length > 0 ? (
           archive.map((yearGroup) => (
             <div key={yearGroup.year} className="space-y-3">
@@ -40,7 +40,7 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
                             href={`/insights?week=${week.key}`}
                             className={`block rounded-2xl px-3 py-2 text-sm transition ${
                               selectedWeek === week.key
-                                ? "bg-[#e7d8b4] text-black"
+                                ? "bg-[#e7d8b4] text-black shadow-sm"
                                 : "bg-white/5 text-zinc-300 hover:bg-white/10"
                             }`}
                           >
@@ -51,7 +51,7 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
                               <Link
                                 key={day.date}
                                 href={`/journal/${day.date}`}
-                                className={`block text-sm transition ${
+                                className={`block text-sm leading-6 transition ${
                                   selectedDate === day.date ? "text-amber-200" : "text-zinc-500 hover:text-zinc-300"
                                 }`}
                               >
