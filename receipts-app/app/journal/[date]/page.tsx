@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
+import { getDailyReflection } from "@/lib/daily-reflection";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/env";
 
@@ -44,8 +46,10 @@ export default async function JournalDayPage({ params }: PageProps) {
     year: "numeric",
   });
 
+  const reflection = await getDailyReflection(entries ?? []);
+
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10 lg:px-8">
+    <main className="mx-auto max-w-5xl px-6 py-10 lg:px-8">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Daily page</p>
@@ -56,47 +60,52 @@ export default async function JournalDayPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <section className="rounded-[2.5rem] border border-[#3b3128] bg-[#11100f] p-6 sm:p-8">
-        <div className="border-b border-amber-50/10 pb-5">
-          <p className="text-sm leading-7 text-zinc-400">
-            What happened on this day, what may have shifted your mood, and what might help next time.
-          </p>
-        </div>
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+        <DailyReflectionCard reflection={reflection} />
 
-        <div className="mt-8 space-y-5">
-          {entries && entries.length > 0 ? (
-            entries.map((entry) => (
-              <article key={entry.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white">{entry.title || "Untitled entry"}</h2>
-                    <p className="mt-1 text-sm text-zinc-500">
-                      {new Date(entry.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                    </p>
+        <section className="rounded-[2.5rem] border border-[#3b3128] bg-[#11100f] p-6 sm:p-8">
+          <div className="border-b border-amber-50/10 pb-5">
+            <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts from the day</p>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">
+              The raw notes are still here underneath the interpretation.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-5">
+            {entries && entries.length > 0 ? (
+              entries.map((entry) => (
+                <article key={entry.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-semibold text-white">{entry.title || "Untitled entry"}</h2>
+                      <p className="mt-1 text-sm text-zinc-500">
+                        {new Date(entry.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400">
+                      Mood {entry.mood_score ?? 3}/5
+                    </span>
                   </div>
-                  <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400">
-                    Mood {entry.mood_score ?? 3}/5
-                  </span>
-                </div>
 
-                <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
+                  <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
 
-                {entry.tags?.length ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {entry.tags.map((tag: string) => (
-                      <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>
-                    ))}
-                  </div>
-                ) : null}
-              </article>
-            ))
-          ) : (
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 text-zinc-400">
-              No entries were saved for this day yet.
-            </div>
-          )}
-        </div>
-      </section>
+                  {entry.tags?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {entry.tags.map((tag: string) => (
+                        <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                </article>
+              ))
+            ) : (
+              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 text-zinc-400">
+                No entries were saved for this day yet.
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
