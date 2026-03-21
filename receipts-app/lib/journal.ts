@@ -16,6 +16,19 @@ export type JournalWeek = {
   days: JournalDay[];
 };
 
+export type JournalMonth = {
+  key: string;
+  label: string;
+  year: number;
+  month: number;
+  weeks: JournalWeek[];
+};
+
+export type JournalYear = {
+  year: number;
+  months: JournalMonth[];
+};
+
 function startOfWeek(date: Date) {
   const copy = new Date(date);
   const day = copy.getDay();
@@ -41,29 +54,22 @@ function formatRangeLabel(start: Date, end: Date) {
 }
 
 export async function getJournalWeeks(): Promise<JournalWeek[]> {
-  if (!hasSupabaseEnv()) {
-    return [];
-  }
+  if (!hasSupabaseEnv()) return [];
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    return [];
-  }
+  if (!user) return [];
 
   const { data, error } = await supabase
     .from("entries")
     .select("id, title, content, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(120);
+    .limit(240);
 
-  if (error || !data) {
-    return [];
-  }
+  if (error || !data) return [];
 
   const weekMap = new Map<string, JournalWeek>();
 
@@ -119,10 +125,42 @@ export async function getJournalWeeks(): Promise<JournalWeek[]> {
   }));
 }
 
-export function getWeekInsights(insights: InsightRecord[], weekKey?: string) {
-  if (!weekKey) {
-    return insights;
+export async function getJournalArchive(): Promise<JournalYear[]> {
+  const weeks = await getJournalWeeks();
+  const yearMap = new Map<number, Map<string, JournalMonth>>();
+
+  for (const week of weeks) {
+    const start = new Date(`${week.startDate}T12:00:00`);
+    const year = start.getFullYear();
+    const month = start.getMonth();
+    const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+
+    if (!yearMap.has(year)) yearMap.set(year, new Map());
+    const months = yearMap.get(year)!;
+
+    if (!months.has(monthKey)) {
+      months.set(monthKey, {
+        key: monthKey,
+        label: start.toLocaleDateString("en-US", { month: "long" }),
+        year,
+        month,
+        weeks: [],
+      });
+    }
+
+    months.get(monthKey)!.weeks.push(week);
   }
+
+  return [...yearMap.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, months]) => ({
+      year,
+      months: [...months.values()].sort((a, b) => b.month - a.month),
+    }));
+}
+
+export function getWeekInsights(insights: InsightRecord[], weekKey?: string) {
+  if (!weekKey) return insights;
 
   return insights.filter((insight) => {
     if (!insight.createdAt) return true;
