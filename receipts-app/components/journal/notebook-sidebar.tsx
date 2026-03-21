@@ -16,6 +16,12 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
         <p className="mt-2 text-sm text-zinc-500">Years, months, weeks, and pages.</p>
       </div>
 
+      <div className="mt-4">
+        <Link href="/journal/archive" className="block rounded-2xl border border-[#5a4b3f] bg-white/5 px-4 py-3 text-sm text-zinc-300 transition hover:bg-white/10">
+          Archived notes
+        </Link>
+      </div>
+
       <div className="mt-5 space-y-5">
         {archive.length > 0 ? (
           archive.map((yearGroup) => (

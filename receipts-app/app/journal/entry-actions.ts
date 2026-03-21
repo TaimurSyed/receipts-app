@@ -28,8 +28,30 @@ export async function archiveEntry(entryId: string, date: string) {
 
   revalidatePath(`/journal/${date}`);
   revalidatePath(`/journal/month/${date.slice(0, 7)}`);
+  revalidatePath("/journal/archive");
   revalidatePath("/app");
+  revalidatePath("/insights");
   return { ok: true as const, message: "Entry archived." };
+}
+
+export async function restoreEntry(entryId: string, date: string) {
+  const auth = await ensureUser();
+  if (!auth.ok) return auth;
+
+  const { error } = await auth.supabase
+    .from("entries")
+    .update({ archived: false })
+    .eq("id", entryId)
+    .eq("user_id", auth.user.id);
+
+  if (error) return { ok: false as const, message: error.message };
+
+  revalidatePath(`/journal/${date}`);
+  revalidatePath(`/journal/month/${date.slice(0, 7)}`);
+  revalidatePath("/journal/archive");
+  revalidatePath("/app");
+  revalidatePath("/insights");
+  return { ok: true as const, message: "Entry restored." };
 }
 
 export async function deleteEntry(entryId: string, date: string) {
@@ -46,7 +68,9 @@ export async function deleteEntry(entryId: string, date: string) {
 
   revalidatePath(`/journal/${date}`);
   revalidatePath(`/journal/month/${date.slice(0, 7)}`);
+  revalidatePath(`/journal/archive`);
   revalidatePath("/app");
+  revalidatePath("/insights");
   return { ok: true as const, message: "Entry deleted." };
 }
 

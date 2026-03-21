@@ -73,8 +73,9 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, content, created_at")
-    .in("id", entryIds);
+    .select("id, title, content, created_at, archived")
+    .in("id", entryIds)
+    .eq("archived", false);
 
   if (error || !data) {
     return {};
