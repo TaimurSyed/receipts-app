@@ -38,7 +38,7 @@ export function EntryForm() {
         <textarea
           name="content"
           className="min-h-36 w-full rounded-3xl border border-white/10 bg-black/20 p-4 text-white outline-none placeholder:text-zinc-500"
-          placeholder="What happened, what triggered it, and what felt off?"
+          placeholder="What happened? What set it off? What did you do next?"
         />
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">

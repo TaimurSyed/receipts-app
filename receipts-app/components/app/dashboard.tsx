@@ -87,7 +87,7 @@ export async function Dashboard() {
                 latestInsights.map((insight) => <InsightCard key={insight.id} insight={insight} evidenceMap={evidenceMap} />)
               ) : (
                 <div className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5 text-zinc-400">
-                  No saved insights yet. Capture a few notes, then generate the first read of your week.
+                  Your notebook is still quiet. Add a few honest notes — what happened, what it felt like, what kept repeating — and the first weekly read will start to have some bite.
                 </div>
               )}
             </div>

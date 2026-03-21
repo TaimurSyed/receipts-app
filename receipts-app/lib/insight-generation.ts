@@ -96,6 +96,19 @@ async function generateInsightsForPeriod({
 
   const periodLabel = scope === "month" ? "monthly" : "weekly";
   const periodPhrase = scope === "month" ? "this month" : "this week";
+  const scopeStyle =
+    scope === "month"
+      ? `MONTH-SPECIFIC STYLE:
+- Sound broader, steadier, and slightly more distilled than the weekly view.
+- Notice recurring loops, repeated moods, and the emotional weather across multiple days.
+- The primary note should feel like a chapter summary, not a diary entry from one afternoon.
+- Prefer cumulative observations over sharp one-off moments unless one moment clearly defines the month.
+- Avoid simply scaling up a weekly insight. The month note should feel earned by repetition.`
+      : `WEEK-SPECIFIC STYLE:
+- Sound close to the ground and recent.
+- Let the writing feel sharper, more immediate, and a little more exposed.
+- Small details from a single day can matter if they reveal the tone of the week.
+- The primary note should read like a page written while the week still has heat in it.`;
 
   const prompt = `You write private-feeling ${periodLabel} notes for a product called Receipts.
 ${toneInstruction}
@@ -109,8 +122,13 @@ STYLE RULES:
 - Use vivid phrasing when the evidence supports it.
 - The writing can be reflective, but it must stay grounded in evidence.
 - If evidence is weak, say less and lower confidence.
+- Avoid generic therapy language, fake profundity, or tidy life lessons.
+- Vary sentence rhythm and structure so the writing does not sound templated.
 - Image notes may contain visual evidence; use them if they matter.
 - Voice memos are already transcribed into text; treat that transcript as real evidence.
+- Not every piece of evidence deserves to surface. Be selective.
+
+${scopeStyle}
 
 LEARNING RULES:
 - The user has sometimes written back to correct or refine the notebook.
@@ -140,6 +158,8 @@ QUALITY BAR:
 - Skip any type that is not well-supported.
 - Never invent evidence.
 - Prefer fewer, stronger insights over many weak ones.
+- If voice or image evidence does not sharpen the interpretation, ignore it.
+- Titles should feel human and memorable, not like report headings.
 
 RECENT USER NOTES:
 ${annotationMemory.length > 0 ? annotationMemory.join("\n") : "(none yet)"}`;

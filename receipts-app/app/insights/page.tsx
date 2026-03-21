@@ -98,8 +98,8 @@ export default async function InsightsPage({ searchParams }: PageProps) {
         {filteredInsights.length === 0 || !primaryNote ? (
           <div className="rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-8 text-zinc-400">
             {scope === "month"
-              ? "No insights yet for this month. Save more entries or generate them when you want a broader read."
-              : "No insights yet for this week. Save more entries or generate them again."}
+              ? "No month read yet. Let the notebook fill up a little, then generate a broader chapter when you want to see what kept repeating."
+              : "No weekly read yet. Give it a few real notes — moments, moods, contradictions, the small stuff you usually hand-wave away — and this page will start sounding like it knows you."}
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
@@ -136,7 +136,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
                 sideNotes.map((insight) => <InsightCard key={insight.id} insight={insight} evidenceMap={evidenceMap} />)
               ) : (
                 <div className="rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-6 text-zinc-400">
-                  Generate a few more entries and this page will start to feel fuller.
+                  Nothing else strong enough to surface yet. That is fine — this notebook should be selective, not chatty.
                 </div>
               )}
             </aside>
