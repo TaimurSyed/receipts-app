@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AnnotationPanel } from "@/components/annotations/annotation-panel";
+import { DayEntryForm } from "@/components/journal/day-entry-form";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageTurnNav } from "@/components/journal/page-turn-nav";
@@ -60,6 +61,7 @@ export default async function JournalDayPage({ params }: PageProps) {
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="space-y-6">
             <DailyReflectionCard reflection={reflection} />
+            <DayEntryForm date={date} />
             <AnnotationPanel
               pageType="day"
               pageKey={date}
