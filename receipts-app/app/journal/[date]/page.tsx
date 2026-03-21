@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { AnnotationPanel } from "@/components/annotations/annotation-panel";
+import { ImageEntryForm } from "@/components/app/image-entry-form";
 import { ImageNote } from "@/components/app/image-note";
 import { VoicePlayback } from "@/components/app/voice-playback";
+import { VoiceEntryForm } from "@/components/app/voice-entry-form";
 import { DayEntryForm } from "@/components/journal/day-entry-form";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
 import { EntryActionsMenu } from "@/components/journal/entry-actions-menu";
@@ -74,6 +76,8 @@ export default async function JournalDayPage({ params }: PageProps) {
           <div className="space-y-6">
             <DailyReflectionCard reflection={reflection} />
             <DayEntryForm date={date} />
+            <VoiceEntryForm date={date} contextLabel="Voice memo for this day" />
+            <ImageEntryForm date={date} contextLabel="Picture note for this day" />
             <AnnotationPanel
               pageType="day"
               pageKey={date}

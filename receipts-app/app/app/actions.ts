@@ -35,6 +35,21 @@ async function getSignedInUser() {
   return { ok: true as const, supabase, user };
 }
 
+function parseTags(formData: FormData) {
+  return String(formData.get("tags") || "")
+    .split(",")
+    .map((tag) => tag.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function getEntryDate(formData: FormData) {
+  return String(formData.get("entryDate") || "").trim();
+}
+
+function getContextLabel(formData: FormData, fallback: string) {
+  return String(formData.get("contextLabel") || fallback).trim();
+}
+
 export async function createEntry(
   _previousState: EntryActionState,
   formData: FormData,
@@ -44,12 +59,9 @@ export async function createEntry(
 
   const content = String(formData.get("content") || "").trim();
   const mood = Number(formData.get("mood") || 3);
-  const entryDate = String(formData.get("entryDate") || "").trim();
-  const contextLabel = String(formData.get("contextLabel") || "entry").trim();
-  const tags = String(formData.get("tags") || "")
-    .split(",")
-    .map((tag) => tag.trim().toLowerCase())
-    .filter(Boolean);
+  const entryDate = getEntryDate(formData);
+  const contextLabel = getContextLabel(formData, "entry");
+  const tags = parseTags(formData);
 
   if (!content) {
     return { ok: false, message: "Entry content is required." };
@@ -72,15 +84,10 @@ export async function createEntry(
     tags,
   };
 
-  if (entryDate) {
-    payload.created_at = buildCreatedAtForDate(entryDate);
-  }
+  if (entryDate) payload.created_at = buildCreatedAtForDate(entryDate);
 
   const { error } = await auth.supabase.from("entries").insert(payload);
-
-  if (error) {
-    return { ok: false, message: error.message };
-  }
+  if (error) return { ok: false, message: error.message };
 
   revalidatePath("/app");
   if (entryDate) revalidatePath(`/journal/${entryDate}`);
@@ -93,21 +100,15 @@ export async function createVoiceEntry(
 ): Promise<EntryActionState> {
   const auth = await getSignedInUser();
   if (!auth.ok) return auth;
-
-  if (!hasOpenAiKey()) {
-    return { ok: false, message: "Add OPENAI_API_KEY to enable voice transcription." };
-  }
+  if (!hasOpenAiKey()) return { ok: false, message: "Add OPENAI_API_KEY to enable voice transcription." };
 
   const file = formData.get("audio") as File | null;
   const mood = Number(formData.get("mood") || 3);
-  const tags = String(formData.get("tags") || "")
-    .split(",")
-    .map((tag) => tag.trim().toLowerCase())
-    .filter(Boolean);
+  const tags = parseTags(formData);
+  const entryDate = getEntryDate(formData);
+  const contextLabel = getContextLabel(formData, "Voice memo");
 
-  if (!file || file.size === 0) {
-    return { ok: false, message: "Attach an audio file first." };
-  }
+  if (!file || file.size === 0) return { ok: false, message: "Attach an audio file first." };
 
   const bytes = Buffer.from(await file.arrayBuffer());
   const safeName = `${auth.user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
@@ -115,14 +116,10 @@ export async function createVoiceEntry(
   const { error: uploadError } = await auth.supabase.storage
     .from("voice-memos")
     .upload(safeName, bytes, { contentType: file.type || "audio/webm", upsert: false });
-
-  if (uploadError) {
-    return { ok: false, message: `${uploadError.message} Run the voice storage SQL setup if needed.` };
-  }
+  if (uploadError) return { ok: false, message: `${uploadError.message} Run the voice storage SQL setup if needed.` };
 
   const client = createOpenAiClient();
   let transcriptText = "";
-
   try {
     const transcription = await client.audio.transcriptions.create({
       file: new File([bytes], file.name, { type: file.type || "audio/webm" }),
@@ -134,11 +131,9 @@ export async function createVoiceEntry(
     return { ok: false, message };
   }
 
-  if (!transcriptText) {
-    return { ok: false, message: "The voice memo was uploaded, but no transcript came back." };
-  }
+  if (!transcriptText) return { ok: false, message: "The voice memo was uploaded, but no transcript came back." };
 
-  const { error: entryError } = await auth.supabase.from("entries").insert({
+  const payload: Record<string, unknown> = {
     user_id: auth.user.id,
     type: "voice",
     title: `Voice memo · ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
@@ -148,14 +143,15 @@ export async function createVoiceEntry(
     tags,
     source: "voice",
     audio_path: safeName,
-  });
+  };
+  if (entryDate) payload.created_at = buildCreatedAtForDate(entryDate);
 
-  if (entryError) {
-    return { ok: false, message: `${entryError.message} Run the voice playback SQL migration if needed.` };
-  }
+  const { error: entryError } = await auth.supabase.from("entries").insert(payload);
+  if (entryError) return { ok: false, message: `${entryError.message} Run the voice playback SQL migration if needed.` };
 
   revalidatePath("/app");
-  return { ok: true, message: "Voice memo transcribed and saved." };
+  if (entryDate) revalidatePath(`/journal/${entryDate}`);
+  return { ok: true, message: `${contextLabel} saved.` };
 }
 
 export async function createImageEntry(
@@ -168,14 +164,11 @@ export async function createImageEntry(
   const file = formData.get("image") as File | null;
   const content = String(formData.get("content") || "").trim();
   const mood = Number(formData.get("mood") || 3);
-  const tags = String(formData.get("tags") || "")
-    .split(",")
-    .map((tag) => tag.trim().toLowerCase())
-    .filter(Boolean);
+  const tags = parseTags(formData);
+  const entryDate = getEntryDate(formData);
+  const contextLabel = getContextLabel(formData, "Picture note");
 
-  if (!file || file.size === 0) {
-    return { ok: false, message: "Attach an image first." };
-  }
+  if (!file || file.size === 0) return { ok: false, message: "Attach an image first." };
 
   const bytes = Buffer.from(await file.arrayBuffer());
   const safeName = `${auth.user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
@@ -183,12 +176,9 @@ export async function createImageEntry(
   const { error: uploadError } = await auth.supabase.storage
     .from("image-notes")
     .upload(safeName, bytes, { contentType: file.type || "image/jpeg", upsert: false });
+  if (uploadError) return { ok: false, message: `${uploadError.message} Run the image storage SQL setup if needed.` };
 
-  if (uploadError) {
-    return { ok: false, message: `${uploadError.message} Run the image storage SQL setup if needed.` };
-  }
-
-  const { error: entryError } = await auth.supabase.from("entries").insert({
+  const payload: Record<string, unknown> = {
     user_id: auth.user.id,
     type: "image",
     title: `Picture note · ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
@@ -197,12 +187,13 @@ export async function createImageEntry(
     tags,
     source: "image",
     image_path: safeName,
-  });
+  };
+  if (entryDate) payload.created_at = buildCreatedAtForDate(entryDate);
 
-  if (entryError) {
-    return { ok: false, message: `${entryError.message} Run the image path SQL migration if needed.` };
-  }
+  const { error: entryError } = await auth.supabase.from("entries").insert(payload);
+  if (entryError) return { ok: false, message: `${entryError.message} Run the image path SQL migration if needed.` };
 
   revalidatePath("/app");
-  return { ok: true, message: "Picture note saved." };
+  if (entryDate) revalidatePath(`/journal/${entryDate}`);
+  return { ok: true, message: `${contextLabel} saved.` };
 }

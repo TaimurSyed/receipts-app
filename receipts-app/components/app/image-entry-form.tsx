@@ -6,7 +6,7 @@ import { createImageEntry } from "@/app/app/actions";
 
 const initialState = { ok: false, message: "" };
 
-export function ImageEntryForm() {
+export function ImageEntryForm({ date, contextLabel }: { date?: string; contextLabel?: string }) {
   const [state, formAction, pending] = useActionState(createImageEntry, initialState);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -28,6 +28,8 @@ export function ImageEntryForm() {
       </div>
 
       <form ref={formRef} action={formAction} className="mt-6 space-y-4">
+        {date ? <input type="hidden" name="entryDate" value={date} /> : null}
+        {contextLabel ? <input type="hidden" name="contextLabel" value={contextLabel} /> : null}
         <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-300">Image file</label>
           <input

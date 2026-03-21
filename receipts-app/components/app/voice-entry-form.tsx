@@ -6,7 +6,7 @@ import { createVoiceEntry } from "@/app/app/actions";
 
 const initialState = { ok: false, message: "" };
 
-export function VoiceEntryForm() {
+export function VoiceEntryForm({ date, contextLabel }: { date?: string; contextLabel?: string }) {
   const [state, formAction, pending] = useActionState(createVoiceEntry, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +76,8 @@ export function VoiceEntryForm() {
       </div>
 
       <form ref={formRef} action={formAction} className="mt-6 space-y-4">
+        {date ? <input type="hidden" name="entryDate" value={date} /> : null}
+        {contextLabel ? <input type="hidden" name="contextLabel" value={contextLabel} /> : null}
         <div className="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -90,13 +92,7 @@ export function VoiceEntryForm() {
           <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 font-semibold text-zinc-200">
             <Upload className="h-4 w-4" />
             Choose audio file
-            <input
-              ref={fileInputRef}
-              name="audio"
-              type="file"
-              accept="audio/*"
-              className="hidden"
-            />
+            <input ref={fileInputRef} name="audio" type="file" accept="audio/*" className="hidden" />
           </label>
         </div>
 
