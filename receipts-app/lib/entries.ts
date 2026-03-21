@@ -12,6 +12,8 @@ export type TimelineEntry = {
   usedInInsight: boolean;
   archived?: boolean;
   dateKey?: string;
+  type?: string;
+  audioPath?: string | null;
 };
 
 export async function getEntries(limit = 20): Promise<TimelineEntry[]> {
@@ -30,7 +32,7 @@ export async function getEntries(limit = 20): Promise<TimelineEntry[]> {
 
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, content, mood_score, tags, created_at, archived")
+    .select("id, title, content, mood_score, tags, created_at, archived, type, audio_path")
     .eq("user_id", user.id)
     .eq("archived", false)
     .order("created_at", { ascending: false })
@@ -55,5 +57,16 @@ export async function getEntries(limit = 20): Promise<TimelineEntry[]> {
     usedInInsight: false,
     archived: entry.archived ?? false,
     dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
+    type: entry.type,
+    audioPath: entry.audio_path ?? null,
   }));
+}
+
+export async function getVoicePlaybackUrl(audioPath?: string | null) {
+  if (!audioPath || !hasSupabaseEnv()) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage.from("voice-memos").createSignedUrl(audioPath, 60 * 10);
+  if (error || !data?.signedUrl) return null;
+  return data.signedUrl;
 }

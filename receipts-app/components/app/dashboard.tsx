@@ -5,12 +5,18 @@ import { TimelineList } from "@/components/app/timeline-list";
 import { InsightCard } from "@/components/insights/insight-card";
 import { getDashboardData } from "@/lib/dashboard";
 import { getEvidenceSnippets } from "@/lib/insights";
+import { getVoicePlaybackUrl } from "@/lib/entries";
 
 export async function Dashboard() {
   const { entries: recentEntries, insights, dominantTheme } = await getDashboardData();
   const latestInsights = insights.slice(0, 2);
   const evidenceIds = [...new Set(latestInsights.flatMap((insight) => insight.evidence))];
   const evidenceMap = await getEvidenceSnippets(evidenceIds);
+  const playbackUrls = Object.fromEntries(
+    await Promise.all(
+      recentEntries.map(async (entry) => [entry.id, await getVoicePlaybackUrl(entry.audioPath)] as const),
+    ),
+  );
 
   return (
     <section className="space-y-6">
@@ -82,7 +88,7 @@ export async function Dashboard() {
             </div>
           </div>
 
-          <TimelineList entries={recentEntries} />
+          <TimelineList entries={recentEntries} playbackUrls={playbackUrls} />
         </div>
       </div>
     </section>

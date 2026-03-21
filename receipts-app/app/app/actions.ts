@@ -147,10 +147,11 @@ export async function createVoiceEntry(
     mood_score: mood,
     tags,
     source: "voice",
+    audio_path: safeName,
   });
 
   if (entryError) {
-    return { ok: false, message: entryError.message };
+    return { ok: false, message: `${entryError.message} Run the voice playback SQL migration if needed.` };
   }
 
   revalidatePath("/app");
