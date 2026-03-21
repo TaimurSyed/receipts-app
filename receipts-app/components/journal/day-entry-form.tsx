@@ -32,18 +32,24 @@ export function DayEntryForm({ date }: { date: string }) {
           placeholder="What do you want to add to this day now that you’re looking back at it?"
         />
         <div className="grid gap-4 sm:grid-cols-2">
-          <select name="mood" defaultValue="3" className="rounded-2xl border border-[#5a4b3f] bg-[#110f0d] px-4 py-3 text-zinc-200 outline-none">
-            <option value="1">Very low</option>
-            <option value="2">Low</option>
-            <option value="3">Neutral</option>
-            <option value="4">Good</option>
-            <option value="5">Great</option>
-          </select>
-          <input
-            name="tags"
-            className="rounded-2xl border border-[#5a4b3f] bg-[#110f0d] px-4 py-3 text-zinc-200 outline-none placeholder:text-zinc-600"
-            placeholder="Tags: hindsight, stress, work"
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">How did this feel?</label>
+            <select name="mood" defaultValue="3" className="w-full rounded-2xl border border-[#5a4b3f] bg-[#110f0d] px-4 py-3 text-zinc-200 outline-none">
+              <option value="1">Very low — rough / overwhelmed</option>
+              <option value="2">Low — tense / drained</option>
+              <option value="3">Neutral — ordinary / hard to read</option>
+              <option value="4">Good — calm / decent</option>
+              <option value="5">Great — energized / strong</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Tags</label>
+            <input
+              name="tags"
+              className="w-full rounded-2xl border border-[#5a4b3f] bg-[#110f0d] px-4 py-3 text-zinc-200 outline-none placeholder:text-zinc-600"
+              placeholder="hindsight, stress, work"
+            />
+          </div>
         </div>
         <button
           disabled={pending}

@@ -41,18 +41,24 @@ export function EntryForm() {
           placeholder="What happened, what triggered it, and what felt off?"
         />
         <div className="grid gap-4 sm:grid-cols-2">
-          <select name="mood" defaultValue="3" className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none">
-            <option value="1">Very low</option>
-            <option value="2">Low</option>
-            <option value="3">Neutral</option>
-            <option value="4">Good</option>
-            <option value="5">Great</option>
-          </select>
-          <input
-            name="tags"
-            className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-zinc-500"
-            placeholder="Tags: work, stress, money"
-          />
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">How did this feel?</label>
+            <select name="mood" defaultValue="3" className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none">
+              <option value="1">Very low — rough / overwhelmed</option>
+              <option value="2">Low — tense / drained</option>
+              <option value="3">Neutral — ordinary / hard to read</option>
+              <option value="4">Good — calm / decent</option>
+              <option value="5">Great — energized / strong</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-zinc-300">Tags</label>
+            <input
+              name="tags"
+              className="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-zinc-500"
+              placeholder="work, stress, money"
+            />
+          </div>
         </div>
         <button disabled={pending} className="w-full rounded-full bg-amber-300 px-5 py-3 font-semibold text-black disabled:cursor-not-allowed disabled:opacity-70">
           {pending ? "Saving..." : "Save entry"}
