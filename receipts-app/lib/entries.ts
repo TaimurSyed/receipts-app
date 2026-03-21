@@ -11,9 +11,10 @@ export type TimelineEntry = {
   time: string;
   usedInInsight: boolean;
   archived?: boolean;
+  dateKey?: string;
 };
 
-export async function getEntries(): Promise<TimelineEntry[]> {
+export async function getEntries(limit = 20): Promise<TimelineEntry[]> {
   if (!hasSupabaseEnv()) {
     return recentEntries;
   }
@@ -33,7 +34,7 @@ export async function getEntries(): Promise<TimelineEntry[]> {
     .eq("user_id", user.id)
     .eq("archived", false)
     .order("created_at", { ascending: false })
-    .limit(8);
+    .limit(limit);
 
   if (error || !data) {
     return recentEntries;
@@ -53,5 +54,6 @@ export async function getEntries(): Promise<TimelineEntry[]> {
     }),
     usedInInsight: false,
     archived: entry.archived ?? false,
+    dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
   }));
 }
