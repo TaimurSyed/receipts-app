@@ -22,9 +22,15 @@ export async function createClient() {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet: CookieToSet[]) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Next.js only allows cookie writes in Server Actions or Route Handlers.
+          // During regular server rendering, Supabase may attempt a cookie refresh;
+          // ignore that here and rely on allowed contexts to persist updates.
+        }
       },
     },
   });
