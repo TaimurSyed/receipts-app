@@ -7,6 +7,8 @@ export type PageAnnotation = {
   pageKey: string;
   body: string;
   createdAt: string;
+  author: "user" | "ai";
+  replyTo?: string | null;
 };
 
 export async function getAnnotations(pageType: "week" | "day", pageKey: string): Promise<PageAnnotation[]> {
@@ -20,12 +22,12 @@ export async function getAnnotations(pageType: "week" | "day", pageKey: string):
 
   const { data, error } = await supabase
     .from("annotations")
-    .select("id, page_type, page_key, body, created_at")
+    .select("id, page_type, page_key, body, created_at, author, reply_to")
     .eq("user_id", user.id)
     .eq("page_type", pageType)
     .eq("page_key", pageKey)
     .order("created_at", { ascending: false })
-    .limit(20);
+    .limit(30);
 
   if (error || !data) return [];
 
@@ -40,5 +42,7 @@ export async function getAnnotations(pageType: "week" | "day", pageKey: string):
       hour: "numeric",
       minute: "2-digit",
     }),
+    author: item.author === "ai" ? "ai" : "user",
+    replyTo: item.reply_to,
   }));
 }
