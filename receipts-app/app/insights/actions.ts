@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { hasOpenAiKey, createOpenAiClient } from "@/lib/ai";
-import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getRecentAnnotationMemory } from "@/lib/annotation-memory";
 import { getTonePreference } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/server";
 
 function extractJsonObject(text: string) {
   const trimmed = text.trim();
@@ -45,20 +46,18 @@ export async function generateInsights(week?: string) {
     .limit(16);
 
   const bounds = getWeekBounds(week);
-  if (bounds) {
-    query = query.gte("created_at", bounds.start).lte("created_at", bounds.end);
-  }
+  if (bounds) query = query.gte("created_at", bounds.start).lte("created_at", bounds.end);
 
   const { data: entries, error: entryError } = await query;
   if (entryError || !entries || entries.length < 3) {
     return { ok: false, message: week ? "Add at least 3 entries in this week before generating." : "Add at least 3 entries before generating insights." };
   }
 
-  const tone = await getTonePreference();
+  const [tone, annotationMemory] = await Promise.all([getTonePreference(), getRecentAnnotationMemory()]);
   const toneInstruction = {
     gentle: "Write with softness, patience, and emotional generosity.",
     direct: "Write with clarity, honesty, and calm precision.",
-    brutal: "Write with sharper honesty, but never be mean or cruel."
+    brutal: "Write with sharper honesty, but never be mean or cruel.",
   }[tone];
 
   const client = createOpenAiClient();
@@ -74,6 +73,12 @@ STYLE RULES:
 - Use vivid phrasing when the evidence supports it.
 - The writing can be reflective, but it must stay grounded in evidence.
 - If evidence is weak, say less and lower confidence.
+
+LEARNING RULES:
+- The user has sometimes written back to correct or refine the notebook.
+- Use those notes as soft memory about how the user interprets their own life.
+- Do not treat user notes as guaranteed truth, but do avoid repeating interpretations the user has clearly pushed back on.
+- If the user's notes suggest a better framing, lean toward it.
 
 OUTPUT RULES:
 Return valid JSON only with this exact shape:
@@ -97,6 +102,9 @@ QUALITY BAR:
 - Skip any type that is not well-supported.
 - Never invent evidence.
 - Prefer fewer, stronger insights over many weak ones.
+
+RECENT USER NOTES:
+${annotationMemory.length > 0 ? annotationMemory.join("\n") : "(none yet)"}
 
 USER ENTRIES:
 ${JSON.stringify(entries, null, 2)}`;

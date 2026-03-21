@@ -1,3 +1,4 @@
+import { getRecentAnnotationMemory } from "@/lib/annotation-memory";
 import { createOpenAiClient, hasOpenAiKey } from "@/lib/ai";
 
 type DayEntry = {
@@ -60,8 +61,10 @@ export async function getDailyReflection(entries: DayEntry[]): Promise<DailyRefl
 
   try {
     const client = createOpenAiClient();
+    const annotationMemory = await getRecentAnnotationMemory();
     const prompt = `You are writing a one-day reflective note for a journaling app.
 Write with warmth and clarity. Do not sound clinical or preachy.
+Recent user-written margin notes may reveal how the user interprets themselves. Use them as soft memory so you do not keep repeating a framing the user has pushed back on.
 Return JSON only with this shape:
 {
   "summary": "2-3 sentences about what seemed to happen that day",
@@ -69,6 +72,9 @@ Return JSON only with this shape:
   "nextStep": "1-2 sentences about what may help next time"
 }
 Ground everything in the entries. Do not invent facts.
+
+RECENT USER NOTES:
+${annotationMemory.length > 0 ? annotationMemory.join("\n") : "(none yet)"}
 
 ENTRIES:
 ${JSON.stringify(entries, null, 2)}`;
