@@ -123,6 +123,7 @@ export async function getJournalWeeks(): Promise<JournalWeek[]> {
         hour: "numeric",
         minute: "2-digit",
       }),
+      dateKey: dayKey,
     });
   }
 

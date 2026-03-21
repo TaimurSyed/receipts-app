@@ -17,6 +17,7 @@ export type EvidenceSnippet = {
   title: string;
   content: string;
   createdAt: string;
+  dateKey: string;
 };
 
 export async function getInsights(): Promise<InsightRecord[]> {
@@ -92,6 +93,7 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
           hour: "numeric",
           minute: "2-digit",
         }),
+        dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
       },
     ]),
   );

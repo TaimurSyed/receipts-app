@@ -1,3 +1,4 @@
+import { ManageNoteMenu } from "@/components/insights/manage-note-menu";
 import type { EvidenceSnippet, InsightRecord } from "@/lib/insights";
 
 type InsightCardProps = {
@@ -46,6 +47,7 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
                     <span className="text-xs text-zinc-500">{evidence?.createdAt ?? "linked entry"}</span>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence?.content ?? "Entry snippet unavailable."}</p>
+                  {evidence?.dateKey ? <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} /> : null}
                 </div>
               );
             })
