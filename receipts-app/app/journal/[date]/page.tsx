@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
 import { NotebookShell } from "@/components/journal/notebook-shell";
+import { PageTurnNav } from "@/components/journal/page-turn-nav";
 import { getDailyReflection } from "@/lib/daily-reflection";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getJournalArchive } from "@/lib/journal";
@@ -31,6 +32,12 @@ export default async function JournalDayPage({ params }: PageProps) {
     .order("created_at", { ascending: true });
 
   const archive = await getJournalArchive();
+  const flatDays = archive.flatMap((year) => year.months.flatMap((month) => month.weeks.flatMap((week) => week.days)))
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const currentIndex = flatDays.findIndex((day) => day.date === date);
+  const previousDay = currentIndex > 0 ? flatDays[currentIndex - 1] : undefined;
+  const nextDay = currentIndex >= 0 && currentIndex < flatDays.length - 1 ? flatDays[currentIndex + 1] : undefined;
+
   const displayDate = new Date(`${date}T12:00:00`).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
@@ -71,6 +78,11 @@ export default async function JournalDayPage({ params }: PageProps) {
                 </article>
               )) : <div className="rounded-[1.5rem] border border-[#4f4338] bg-[#15120f] p-5 text-zinc-400">No entries were saved for this day yet.</div>}
             </div>
+
+            <PageTurnNav
+              previous={previousDay ? { href: `/journal/${previousDay.date}`, label: previousDay.displayDate } : undefined}
+              next={nextDay ? { href: `/journal/${nextDay.date}`, label: nextDay.displayDate } : undefined}
+            />
           </section>
         </div>
       </div>

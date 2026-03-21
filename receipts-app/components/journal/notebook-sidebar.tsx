@@ -24,7 +24,9 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
               <div className="space-y-4 border-l border-[#5e503f]/30 pl-4">
                 {yearGroup.months.map((month) => (
                   <div key={month.key} className="space-y-2">
-                    <p className="font-serif text-lg text-zinc-300">{month.label}</p>
+                    <Link href={`/journal/month/${month.key}`} className="font-serif text-lg text-zinc-300 transition hover:text-[#f1e7d4]">
+                      {month.label}
+                    </Link>
                     <div className="space-y-2">
                       {month.weeks.map((week) => (
                         <div key={week.key} className="space-y-2">
