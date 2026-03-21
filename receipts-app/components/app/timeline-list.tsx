@@ -1,12 +1,21 @@
 import Link from "next/link";
 import type { TimelineEntry } from "@/lib/entries";
 import { VoicePlayback } from "@/components/app/voice-playback";
+import { ImageNote } from "@/components/app/image-note";
 
 function moodLabel(score: number) {
   return ["Very low", "Low", "Neutral", "Good", "Great"][score - 1] ?? "Unknown";
 }
 
-export function TimelineList({ entries, playbackUrls = {} }: { entries: TimelineEntry[]; playbackUrls?: Record<string, string | null> }) {
+export function TimelineList({
+  entries,
+  playbackUrls = {},
+  imageUrls = {},
+}: {
+  entries: TimelineEntry[];
+  playbackUrls?: Record<string, string | null>;
+  imageUrls?: Record<string, string | null>;
+}) {
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
       <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
@@ -23,6 +32,7 @@ export function TimelineList({ entries, playbackUrls = {} }: { entries: Timeline
         {entries.length > 0 ? entries.map((entry) => {
           const dateKey = entry.dateKey ?? new Date().toISOString().slice(0, 10);
           const playbackUrl = playbackUrls[entry.id];
+          const imageUrl = imageUrls[entry.id];
           return (
             <article key={entry.id} className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5">
               <div className="flex items-start justify-between gap-3">
@@ -36,6 +46,7 @@ export function TimelineList({ entries, playbackUrls = {} }: { entries: Timeline
               </div>
               <p className="mt-4 whitespace-pre-line text-sm leading-7 text-zinc-300">{entry.content}</p>
               {entry.type === "voice" && playbackUrl ? <VoicePlayback url={playbackUrl} /> : null}
+              {entry.type === "image" && imageUrl ? <ImageNote url={imageUrl} /> : null}
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Link href={`/journal/${dateKey}`} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
                   Open day

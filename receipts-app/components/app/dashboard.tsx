@@ -5,7 +5,7 @@ import { TimelineList } from "@/components/app/timeline-list";
 import { InsightCard } from "@/components/insights/insight-card";
 import { getDashboardData } from "@/lib/dashboard";
 import { getEvidenceSnippets } from "@/lib/insights";
-import { getVoicePlaybackUrl } from "@/lib/entries";
+import { getImagePlaybackUrl, getVoicePlaybackUrl } from "@/lib/entries";
 
 export async function Dashboard() {
   const { entries: recentEntries, insights, dominantTheme } = await getDashboardData();
@@ -15,6 +15,11 @@ export async function Dashboard() {
   const playbackUrls = Object.fromEntries(
     await Promise.all(
       recentEntries.map(async (entry) => [entry.id, await getVoicePlaybackUrl(entry.audioPath)] as const),
+    ),
+  );
+  const imageUrls = Object.fromEntries(
+    await Promise.all(
+      recentEntries.map(async (entry) => [entry.id, await getImagePlaybackUrl(entry.imagePath)] as const),
     ),
   );
 
@@ -88,7 +93,7 @@ export async function Dashboard() {
             </div>
           </div>
 
-          <TimelineList entries={recentEntries} playbackUrls={playbackUrls} />
+          <TimelineList entries={recentEntries} playbackUrls={playbackUrls} imageUrls={imageUrls} />
         </div>
       </div>
     </section>

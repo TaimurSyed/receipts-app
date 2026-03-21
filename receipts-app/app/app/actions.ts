@@ -157,3 +157,52 @@ export async function createVoiceEntry(
   revalidatePath("/app");
   return { ok: true, message: "Voice memo transcribed and saved." };
 }
+
+export async function createImageEntry(
+  _previousState: EntryActionState,
+  formData: FormData,
+): Promise<EntryActionState> {
+  const auth = await getSignedInUser();
+  if (!auth.ok) return auth;
+
+  const file = formData.get("image") as File | null;
+  const content = String(formData.get("content") || "").trim();
+  const mood = Number(formData.get("mood") || 3);
+  const tags = String(formData.get("tags") || "")
+    .split(",")
+    .map((tag) => tag.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!file || file.size === 0) {
+    return { ok: false, message: "Attach an image first." };
+  }
+
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const safeName = `${auth.user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+
+  const { error: uploadError } = await auth.supabase.storage
+    .from("image-notes")
+    .upload(safeName, bytes, { contentType: file.type || "image/jpeg", upsert: false });
+
+  if (uploadError) {
+    return { ok: false, message: `${uploadError.message} Run the image storage SQL setup if needed.` };
+  }
+
+  const { error: entryError } = await auth.supabase.from("entries").insert({
+    user_id: auth.user.id,
+    type: "image",
+    title: `Picture note · ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+    content: content || "Picture note",
+    mood_score: mood,
+    tags,
+    source: "image",
+    image_path: safeName,
+  });
+
+  if (entryError) {
+    return { ok: false, message: `${entryError.message} Run the image path SQL migration if needed.` };
+  }
+
+  revalidatePath("/app");
+  return { ok: true, message: "Picture note saved." };
+}
