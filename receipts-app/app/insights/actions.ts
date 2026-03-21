@@ -1,9 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { hasOpenAiKey, createOpenAiClient } from "@/lib/ai";
+import { hasOpenAiKey } from "@/lib/ai";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getRecentAnnotationMemory } from "@/lib/annotation-memory";
+import { createMultimodalResponse } from "@/lib/multimodal-insights";
 import { getTonePreference } from "@/lib/profile";
 import { createClient } from "@/lib/supabase/server";
 
@@ -40,7 +41,7 @@ export async function generateInsights(week?: string) {
 
   let query = supabase
     .from("entries")
-    .select("id, title, content, mood_score, tags, created_at")
+    .select("id, title, content, mood_score, tags, created_at, type, image_path")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(16);
@@ -60,7 +61,6 @@ export async function generateInsights(week?: string) {
     brutal: "Write with sharper honesty, but never be mean or cruel.",
   }[tone];
 
-  const client = createOpenAiClient();
   const prompt = `You write private-feeling weekly notes for a product called Receipts.
 ${toneInstruction}
 The result should feel memorable, diary-like, and emotionally intelligent without becoming corny.
@@ -73,6 +73,8 @@ STYLE RULES:
 - Use vivid phrasing when the evidence supports it.
 - The writing can be reflective, but it must stay grounded in evidence.
 - If evidence is weak, say less and lower confidence.
+- Image notes may contain visual evidence; use them if they matter.
+- Voice memos are already transcribed into text; treat that transcript as real evidence.
 
 LEARNING RULES:
 - The user has sometimes written back to correct or refine the notebook.
@@ -104,14 +106,11 @@ QUALITY BAR:
 - Prefer fewer, stronger insights over many weak ones.
 
 RECENT USER NOTES:
-${annotationMemory.length > 0 ? annotationMemory.join("\n") : "(none yet)"}
-
-USER ENTRIES:
-${JSON.stringify(entries, null, 2)}`;
+${annotationMemory.length > 0 ? annotationMemory.join("\n") : "(none yet)"}`;
 
   let text = "";
   try {
-    const response = await client.responses.create({ model: "gpt-4.1-mini", input: prompt });
+    const response = await createMultimodalResponse(entries, prompt);
     text = response.output_text;
   } catch (error) {
     const message = error instanceof Error ? error.message : "OpenAI request failed.";
