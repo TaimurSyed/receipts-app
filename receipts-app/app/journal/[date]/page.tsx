@@ -9,6 +9,7 @@ import { DailyReflectionCard } from "@/components/journal/daily-reflection-card"
 import { EntryActionsMenu } from "@/components/journal/entry-actions-menu";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageTurnNav } from "@/components/journal/page-turn-nav";
+import { PageNav } from "@/components/navigation/page-nav";
 import { getAnnotations } from "@/lib/annotations";
 import { getDailyReflection } from "@/lib/daily-reflection";
 import { getImagePlaybackUrl, getVoicePlaybackUrl } from "@/lib/entries";
@@ -58,11 +59,14 @@ export default async function JournalDayPage({ params }: PageProps) {
   const displayDate = new Date(`${date}T12:00:00`).toLocaleDateString("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
+  const monthKey = date.slice(0, 7);
   const reflection = await getDailyReflection(entries ?? []);
   const annotations = await getAnnotations("day", date);
 
   return (
     <NotebookShell archive={archive} selectedDate={date}>
+      <PageNav items={[{ label: "App", href: "/app" }, { label: "Journal", href: "/insights" }, { label: monthKey, href: `/journal/month/${monthKey}` }, { label: displayDate }]} />
+
       <div className="notebook-page-edge notebook-paper rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 lg:p-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>

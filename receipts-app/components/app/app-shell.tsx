@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "@/components/app/sidebar";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { PageNav } from "@/components/navigation/page-nav";
 
 export function AppShell({
   title,
@@ -13,6 +14,8 @@ export function AppShell({
 }) {
   return (
     <main className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+      <PageNav items={[{ label: "App", href: "/app" }, { label: title }]} />
+
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts app</p>

@@ -4,6 +4,7 @@ import { GenerateInsightsButton } from "@/components/insights/generate-insights-
 import { InsightCard } from "@/components/insights/insight-card";
 import { TonePicker } from "@/components/insights/tone-picker";
 import { NotebookShell } from "@/components/journal/notebook-shell";
+import { PageNav } from "@/components/navigation/page-nav";
 import { getAnnotations } from "@/lib/annotations";
 import { getEvidenceSnippets, getInsights } from "@/lib/insights";
 import { getJournalArchive, getJournalWeeks, getWeekInsights } from "@/lib/journal";
@@ -32,6 +33,8 @@ export default async function InsightsPage({ searchParams }: PageProps) {
 
   return (
     <NotebookShell archive={archive} selectedWeek={selectedWeek ?? activeWeek?.key}>
+      <PageNav items={[{ label: "App", href: "/app" }, { label: "Journal", href: "/insights" }, { label: activeWeek?.label ?? "Week" }]} />
+
       <div className="notebook-page-edge notebook-paper rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#17130f_0%,#0f0d0b_100%)] p-6 sm:p-8 lg:p-10">
         <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div>

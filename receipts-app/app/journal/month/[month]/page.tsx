@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { ImageEntryForm } from "@/components/app/image-entry-form";
+import { VoiceEntryForm } from "@/components/app/voice-entry-form";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { QuickAddForm } from "@/components/journal/quick-add-form";
-import { VoiceEntryForm } from "@/components/app/voice-entry-form";
-import { ImageEntryForm } from "@/components/app/image-entry-form";
+import { PageNav } from "@/components/navigation/page-nav";
 import { buildMonthGrid, getJournalArchive } from "@/lib/journal";
 
 const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -33,6 +34,8 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
 
   return (
     <NotebookShell archive={archive}>
+      <PageNav items={[{ label: "App", href: "/app" }, { label: "Journal", href: "/insights" }, { label: monthRecord.label }]} />
+
       <div className="notebook-page-edge notebook-paper rounded-[2.7rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#15120f_0%,#0f0d0b_100%)] p-6 sm:p-8 lg:p-10 shadow-panel">
         <div className="border-b border-[#5e503f]/40 pb-6">
           <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Month view</p>
