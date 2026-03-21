@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrainCircuit, Plus, Sparkles } from "lucide-react";
 import { EntryForm } from "@/components/app/entry-form";
+import { VoiceEntryForm } from "@/components/app/voice-entry-form";
 import { InsightCard } from "@/components/insights/insight-card";
 import { getDashboardData } from "@/lib/dashboard";
 import { getEvidenceSnippets } from "@/lib/insights";
@@ -84,6 +85,7 @@ export async function Dashboard() {
           <div id="entry-form">
             <EntryForm />
           </div>
+          <VoiceEntryForm />
 
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Recent timeline</p>
