@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, AudioLines, BadgeAlert, NotebookPen } from "lucide-react";
 import { Chip } from "@/components/ui/chip";
 
@@ -22,7 +23,30 @@ const proofCards = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-white/10">
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-28">
+      <div className="mx-auto max-w-7xl px-6 pt-6 lg:px-8">
+        <div className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
+          <div className="flex items-center gap-3">
+            <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+            <p className="text-sm font-medium text-white">Receipts</p>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/sign-in"
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/sign-up"
+              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-zinc-200"
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-24">
         <div className="space-y-8">
           <div className="flex flex-wrap gap-3">
             <Chip label="Forensic self-insight" />
@@ -40,13 +64,13 @@ export function Hero() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <a
-              href="#waitlist"
+            <Link
+              href="/sign-up"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
             >
               Get your first receipt
               <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
             <a
               href="#product"
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
