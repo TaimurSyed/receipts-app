@@ -1,11 +1,15 @@
-import { AudioLines, BrainCircuit, CalendarRange, Plus } from "lucide-react";
-import { insightCards, recentEntries } from "@/lib/mock-data";
+import { AudioLines, BrainCircuit, Plus } from "lucide-react";
+import { EntryForm } from "@/components/app/entry-form";
+import { getEntries } from "@/lib/entries";
+import { insightCards } from "@/lib/mock-data";
 
 function moodLabel(score: number) {
   return ["Very low", "Low", "Neutral", "Good", "Great"][score - 1] ?? "Unknown";
 }
 
-export function Dashboard() {
+export async function Dashboard() {
+  const recentEntries = await getEntries();
+
   return (
     <section className="space-y-6">
       <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
@@ -16,7 +20,7 @@ export function Dashboard() {
               Your week, under intelligent review.
             </h1>
             <p className="mt-3 max-w-2xl text-zinc-400">
-              Fast capture on one side, evidence-backed insight on the other. This is the first in-app slice of Receipts.
+              Fast capture on one side, evidence-backed insight on the other. The app now supports a real server-side save path once Supabase keys are added.
             </p>
           </div>
 
@@ -37,16 +41,16 @@ export function Dashboard() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Entries this week</p>
-              <p className="mt-4 text-3xl font-semibold text-white">12</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Entries visible</p>
+              <p className="mt-4 text-3xl font-semibold text-white">{recentEntries.length}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Signals found</p>
-              <p className="mt-4 text-3xl font-semibold text-white">7</p>
+              <p className="mt-4 text-3xl font-semibold text-white">{insightCards.length}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Dominant theme</p>
-              <p className="mt-4 text-2xl font-semibold text-white">Stress loops</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Mode</p>
+              <p className="mt-4 text-2xl font-semibold text-white">Hybrid mock/live</p>
             </div>
           </div>
 
@@ -78,38 +82,7 @@ export function Dashboard() {
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Quick capture</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Log something before you forget it</h2>
-              </div>
-              <CalendarRange className="h-5 w-5 text-amber-300" />
-            </div>
-
-            <form className="mt-6 space-y-4">
-              <textarea
-                className="min-h-36 w-full rounded-3xl border border-white/10 bg-black/20 p-4 text-white outline-none placeholder:text-zinc-500"
-                placeholder="What happened, what triggered it, and what felt off?"
-              />
-              <div className="grid gap-4 sm:grid-cols-2">
-                <select className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none">
-                  <option>Mood: Neutral</option>
-                  <option>Very low</option>
-                  <option>Low</option>
-                  <option>Good</option>
-                  <option>Great</option>
-                </select>
-                <input
-                  className="rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-zinc-500"
-                  placeholder="Tags: work, stress, money"
-                />
-              </div>
-              <button className="w-full rounded-full bg-amber-300 px-5 py-3 font-semibold text-black">
-                Save entry
-              </button>
-            </form>
-          </div>
+          <EntryForm />
 
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Recent timeline</p>
@@ -127,7 +100,7 @@ export function Dashboard() {
                   </div>
                   <p className="mt-3 text-sm leading-6 text-zinc-400">{entry.content}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {entry.tags.map((tag) => (
+                    {entry.tags.map((tag: string) => (
                       <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">
                         #{tag}
                       </span>
