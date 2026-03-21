@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { QuickAddForm } from "@/components/journal/quick-add-form";
+import { VoiceEntryForm } from "@/components/app/voice-entry-form";
+import { ImageEntryForm } from "@/components/app/image-entry-form";
 import { buildMonthGrid, getJournalArchive } from "@/lib/journal";
 
 const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -39,19 +41,24 @@ export default async function JournalMonthPage({ params, searchParams }: PagePro
         </div>
 
         {addDate ? (
-          <div className="mt-8 rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-5">
-            <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#5e503f]/30 pb-4">
+          <div className="mt-8 space-y-6 rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-5">
+            <div className="mb-1 flex items-center justify-between gap-3 border-b border-[#5e503f]/30 pb-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Quick add</p>
                 <h2 className="mt-2 font-serif text-2xl text-[#f1e7d4] sm:text-3xl">
-                  Add a note to {new Date(`${addDate}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  Add to {new Date(`${addDate}T12:00:00`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                 </h2>
+                <p className="mt-2 text-sm leading-6 text-zinc-400">
+                  Add a text note, voice memo, or picture without leaving the calendar view.
+                </p>
               </div>
               <Link href={`/journal/month/${monthRecord.key}`} className="rounded-full border border-[#5a4b3f] bg-[#1a1714] px-4 py-2 text-sm font-semibold text-[#f1e7d4]">
                 Close
               </Link>
             </div>
             <QuickAddForm date={addDate} />
+            <VoiceEntryForm date={addDate} contextLabel="Voice memo for this day" />
+            <ImageEntryForm date={addDate} contextLabel="Picture note for this day" />
           </div>
         ) : null}
 
