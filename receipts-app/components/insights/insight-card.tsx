@@ -40,14 +40,23 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
           {insight.evidence.length > 0 ? (
             insight.evidence.map((entryId) => {
               const evidence = evidenceMap?.[entryId];
+              if (!evidence) {
+                return (
+                  <div key={entryId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                    <p className="font-medium text-white">Linked note unavailable</p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-400">This linked note could not be loaded.</p>
+                  </div>
+                );
+              }
+
               return (
                 <div key={entryId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="font-medium text-white">{evidence?.title ?? entryId}</p>
-                    <span className="text-xs text-zinc-500">{evidence?.createdAt ?? "linked entry"}</span>
+                    <p className="font-medium text-white">{evidence.archived ? "This note is archived" : evidence.title}</p>
+                    <span className="text-xs text-zinc-500">{evidence.createdAt}</span>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence?.content ?? "Entry snippet unavailable."}</p>
-                  {evidence?.dateKey ? <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} /> : null}
+                  <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence.content}</p>
+                  <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} archived={evidence.archived} />
                 </div>
               );
             })

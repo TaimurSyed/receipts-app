@@ -18,6 +18,7 @@ export type EvidenceSnippet = {
   content: string;
   createdAt: string;
   dateKey: string;
+  archived?: boolean;
 };
 
 export async function getInsights(): Promise<InsightRecord[]> {
@@ -74,8 +75,7 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
   const { data, error } = await supabase
     .from("entries")
     .select("id, title, content, created_at, archived")
-    .in("id", entryIds)
-    .eq("archived", false);
+    .in("id", entryIds);
 
   if (error || !data) {
     return {};
@@ -87,7 +87,7 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
       {
         id: entry.id,
         title: entry.title || "Untitled entry",
-        content: entry.content,
+        content: entry.archived ? "This note is archived and hidden from the active notebook." : entry.content,
         createdAt: new Date(entry.created_at).toLocaleString("en-US", {
           month: "short",
           day: "numeric",
@@ -95,6 +95,7 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
           minute: "2-digit",
         }),
         dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
+        archived: entry.archived ?? false,
       },
     ]),
   );
