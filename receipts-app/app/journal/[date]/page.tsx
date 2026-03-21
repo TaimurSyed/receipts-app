@@ -10,27 +10,16 @@ type PageProps = {
 
 export default async function JournalDayPage({ params }: PageProps) {
   const { date } = await params;
-
   if (!hasSupabaseEnv()) {
-    return (
-      <main className="mx-auto max-w-4xl px-6 py-10 lg:px-8">
-        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 text-zinc-400">Supabase is not configured.</div>
-      </main>
-    );
+    return <main className="mx-auto max-w-4xl px-6 py-10 lg:px-8"><div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 text-zinc-400">Supabase is not configured.</div></main>;
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return null;
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
 
   const start = `${date}T00:00:00.000Z`;
   const end = `${date}T23:59:59.999Z`;
-
   const { data: entries } = await supabase
     .from("entries")
     .select("id, title, content, created_at, mood_score, tags")
@@ -40,12 +29,8 @@ export default async function JournalDayPage({ params }: PageProps) {
     .order("created_at", { ascending: true });
 
   const displayDate = new Date(`${date}T12:00:00`).toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
+    weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
-
   const reflection = await getDailyReflection(entries ?? []);
 
   return (
@@ -53,56 +38,34 @@ export default async function JournalDayPage({ params }: PageProps) {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Daily page</p>
-          <h1 className="mt-2 font-serif text-4xl text-amber-50">{displayDate}</h1>
+          <h1 className="mt-2 font-serif text-5xl text-[#f5ecd8]">{displayDate}</h1>
         </div>
-        <Link href="/insights" className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
-          Back to journal
-        </Link>
+        <Link href="/insights" className="rounded-full border border-[#5a4b3f] bg-[#1a1714] px-4 py-2 text-sm font-semibold text-[#f1e7d4]">Back to journal</Link>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
         <DailyReflectionCard reflection={reflection} />
 
-        <section className="rounded-[2.5rem] border border-[#3b3128] bg-[#11100f] p-6 sm:p-8">
-          <div className="border-b border-amber-50/10 pb-5">
+        <section className="rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#181410_0%,#11100f_100%)] p-6 sm:p-8 shadow-panel">
+          <div className="border-b border-[#5e503f]/40 pb-5">
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts from the day</p>
-            <p className="mt-3 text-sm leading-7 text-zinc-400">
-              The raw notes are still here underneath the interpretation.
-            </p>
+            <p className="mt-3 text-sm leading-7 text-zinc-400">The raw notes are still here underneath the interpretation.</p>
           </div>
 
           <div className="mt-8 space-y-5">
-            {entries && entries.length > 0 ? (
-              entries.map((entry) => (
-                <article key={entry.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-xl font-semibold text-white">{entry.title || "Untitled entry"}</h2>
-                      <p className="mt-1 text-sm text-zinc-500">
-                        {new Date(entry.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
-                      </p>
-                    </div>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400">
-                      Mood {entry.mood_score ?? 3}/5
-                    </span>
+            {entries && entries.length > 0 ? entries.map((entry) => (
+              <article key={entry.id} className="rounded-[1.5rem] border border-[#4f4338] bg-[#15120f] p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl font-semibold text-[#f1e7d4]">{entry.title || "Untitled entry"}</h2>
+                    <p className="mt-1 text-sm text-zinc-500">{new Date(entry.created_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</p>
                   </div>
-
-                  <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
-
-                  {entry.tags?.length ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {entry.tags.map((tag: string) => (
-                        <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>
-                      ))}
-                    </div>
-                  ) : null}
-                </article>
-              ))
-            ) : (
-              <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 text-zinc-400">
-                No entries were saved for this day yet.
-              </div>
-            )}
+                  <span className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-400">Mood {entry.mood_score ?? 3}/5</span>
+                </div>
+                <p className="mt-4 whitespace-pre-line font-serif text-[17px] leading-8 text-zinc-200">{entry.content}</p>
+                {entry.tags?.length ? <div className="mt-4 flex flex-wrap gap-2">{entry.tags.map((tag: string) => <span key={tag} className="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300">#{tag}</span>)}</div> : null}
+              </article>
+            )) : <div className="rounded-[1.5rem] border border-[#4f4338] bg-[#15120f] p-5 text-zinc-400">No entries were saved for this day yet.</div>}
           </div>
         </section>
       </div>
