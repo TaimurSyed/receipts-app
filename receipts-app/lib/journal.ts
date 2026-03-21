@@ -168,11 +168,24 @@ export async function getJournalArchive(): Promise<JournalYear[]> {
 }
 
 export function getWeekInsights(insights: InsightRecord[], weekKey?: string) {
-  if (!weekKey) return insights;
+  const weeklyInsights = insights.filter((insight) => (insight.scope ?? "week") === "week");
+  if (!weekKey) return weeklyInsights;
 
-  return insights.filter((insight) => {
+  return weeklyInsights.filter((insight) => {
+    if (insight.periodStart) return insight.periodStart === weekKey;
     if (!insight.createdAt) return true;
     return formatDate(startOfWeek(new Date(insight.createdAt))) === weekKey;
+  });
+}
+
+export function getMonthInsights(insights: InsightRecord[], monthKey?: string) {
+  const monthlyInsights = insights.filter((insight) => (insight.scope ?? "week") === "month");
+  if (!monthKey) return monthlyInsights;
+
+  return monthlyInsights.filter((insight) => {
+    if (insight.periodStart) return insight.periodStart.startsWith(monthKey);
+    if (!insight.createdAt) return false;
+    return insight.createdAt.slice(0, 7) === monthKey;
   });
 }
 

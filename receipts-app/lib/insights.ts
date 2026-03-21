@@ -10,6 +10,8 @@ export type InsightRecord = {
   confidence: string;
   evidence: string[];
   createdAt?: string;
+  scope?: "week" | "month";
+  periodStart?: string | null;
 };
 
 export type EvidenceSnippet = {
@@ -42,12 +44,23 @@ export async function getInsights(): Promise<InsightRecord[]> {
     return [];
   }
 
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("insights")
-    .select("id, type, title, body, confidence, evidence_entry_ids, created_at")
+    .select("id, type, title, body, confidence, evidence_entry_ids, created_at, scope, period_start, week_start")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(12);
+    .limit(24);
+
+  if (error) {
+    const fallback = await supabase
+      .from("insights")
+      .select("id, type, title, body, confidence, evidence_entry_ids, created_at, week_start")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(24);
+    data = fallback.data as any;
+    error = fallback.error;
+  }
 
   if (error || !data) {
     return [];
@@ -63,6 +76,8 @@ export async function getInsights(): Promise<InsightRecord[]> {
       ? item.evidence_entry_ids.filter((entryId): entryId is string => typeof entryId === "string")
       : [],
     createdAt: item.created_at,
+    scope: item.scope === "month" ? "month" : "week",
+    periodStart: item.period_start ?? item.week_start ?? null,
   }));
 }
 

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createOpenAiClient, hasOpenAiKey } from "@/lib/ai";
 import { hasSupabaseEnv } from "@/lib/env";
+import { refreshWeeklyInsightsForEntryDate } from "@/lib/insight-generation";
 import { createClient } from "@/lib/supabase/server";
 
 type EntryActionState = {
@@ -89,9 +90,16 @@ export async function createEntry(
   const { error } = await auth.supabase.from("entries").insert(payload);
   if (error) return { ok: false, message: error.message };
 
+  const refreshResult = await refreshWeeklyInsightsForEntryDate(entryDate);
+
   revalidatePath("/app");
   if (entryDate) revalidatePath(`/journal/${entryDate}`);
-  return { ok: true, message: `${contextLabel} saved.` };
+  return {
+    ok: true,
+    message: refreshResult.ok
+      ? `${contextLabel} saved. Weekly insights refreshed automatically.`
+      : `${contextLabel} saved. ${refreshResult.message}`,
+  };
 }
 
 export async function createVoiceEntry(
@@ -149,9 +157,16 @@ export async function createVoiceEntry(
   const { error: entryError } = await auth.supabase.from("entries").insert(payload);
   if (entryError) return { ok: false, message: `${entryError.message} Run the voice playback SQL migration if needed.` };
 
+  const refreshResult = await refreshWeeklyInsightsForEntryDate(entryDate);
+
   revalidatePath("/app");
   if (entryDate) revalidatePath(`/journal/${entryDate}`);
-  return { ok: true, message: `${contextLabel} saved.` };
+  return {
+    ok: true,
+    message: refreshResult.ok
+      ? `${contextLabel} saved. Weekly insights refreshed automatically.`
+      : `${contextLabel} saved. ${refreshResult.message}`,
+  };
 }
 
 export async function createImageEntry(
@@ -193,7 +208,14 @@ export async function createImageEntry(
   const { error: entryError } = await auth.supabase.from("entries").insert(payload);
   if (entryError) return { ok: false, message: `${entryError.message} Run the image path SQL migration if needed.` };
 
+  const refreshResult = await refreshWeeklyInsightsForEntryDate(entryDate);
+
   revalidatePath("/app");
   if (entryDate) revalidatePath(`/journal/${entryDate}`);
-  return { ok: true, message: `${contextLabel} saved.` };
+  return {
+    ok: true,
+    message: refreshResult.ok
+      ? `${contextLabel} saved. Weekly insights refreshed automatically.`
+      : `${contextLabel} saved. ${refreshResult.message}`,
+  };
 }
