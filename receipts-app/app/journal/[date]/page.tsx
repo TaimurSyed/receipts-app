@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { AnnotationPanel } from "@/components/annotations/annotation-panel";
 import { DailyReflectionCard } from "@/components/journal/daily-reflection-card";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageTurnNav } from "@/components/journal/page-turn-nav";
+import { getAnnotations } from "@/lib/annotations";
 import { getDailyReflection } from "@/lib/daily-reflection";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getJournalArchive } from "@/lib/journal";
@@ -42,6 +44,7 @@ export default async function JournalDayPage({ params }: PageProps) {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   });
   const reflection = await getDailyReflection(entries ?? []);
+  const annotations = await getAnnotations("day", date);
 
   return (
     <NotebookShell archive={archive} selectedDate={date}>
@@ -55,7 +58,15 @@ export default async function JournalDayPage({ params }: PageProps) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-          <DailyReflectionCard reflection={reflection} />
+          <div className="space-y-6">
+            <DailyReflectionCard reflection={reflection} />
+            <AnnotationPanel
+              pageType="day"
+              pageKey={date}
+              annotations={annotations}
+              prompt="Answer back to the day here. Correct the read, add context, or leave a note for future-you."
+            />
+          </div>
 
           <section className="rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#181410_0%,#11100f_100%)] p-6 sm:p-8 shadow-panel">
             <div className="border-b border-[#5e503f]/40 pb-5">

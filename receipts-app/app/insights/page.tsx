@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { AnnotationPanel } from "@/components/annotations/annotation-panel";
 import { GenerateInsightsButton } from "@/components/insights/generate-insights-button";
 import { InsightCard } from "@/components/insights/insight-card";
 import { TonePicker } from "@/components/insights/tone-picker";
 import { NotebookShell } from "@/components/journal/notebook-shell";
+import { getAnnotations } from "@/lib/annotations";
 import { getEvidenceSnippets, getInsights } from "@/lib/insights";
 import { getJournalArchive, getJournalWeeks, getWeekInsights } from "@/lib/journal";
 import { getTonePreference } from "@/lib/profile";
@@ -26,6 +28,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
   const evidenceMap = await getEvidenceSnippets(evidenceIds);
   const weeklyNote = filteredInsights.find((insight) => insight.type === "weekly_receipt") ?? filteredInsights[0];
   const sideNotes = filteredInsights.filter((insight) => insight.id !== weeklyNote?.id);
+  const annotations = activeWeek ? await getAnnotations("week", activeWeek.key) : [];
 
   return (
     <NotebookShell archive={archive} selectedWeek={selectedWeek ?? activeWeek?.key}>
@@ -60,16 +63,25 @@ export default async function InsightsPage({ searchParams }: PageProps) {
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
-            <section className="rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#1a1612_0%,#11100f_100%)] p-6 sm:p-10">
+            <section className="space-y-6 rounded-[2.5rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#1a1612_0%,#11100f_100%)] p-6 sm:p-10">
               <div className="border-b border-[#5e503f]/40 pb-6">
                 <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Weekly page</p>
                 <h2 className="mt-3 font-serif text-5xl tracking-tight text-[#f5ecd8]">What this week kept trying to say</h2>
                 <p className="mt-3 text-sm text-zinc-500">{activeWeek?.label ?? "Recent days"}</p>
               </div>
 
-              <div className="mt-8 border-l border-[#6a5847]/40 pl-6">
+              <div className="border-l border-[#6a5847]/40 pl-6">
                 <InsightCard insight={weeklyNote} evidenceMap={evidenceMap} variant="journal" />
               </div>
+
+              {activeWeek ? (
+                <AnnotationPanel
+                  pageType="week"
+                  pageKey={activeWeek.key}
+                  annotations={annotations}
+                  prompt="If the page missed something, you can answer back here. Treat it like writing in the margin of your own week."
+                />
+              ) : null}
             </section>
 
             <aside className="space-y-5">
