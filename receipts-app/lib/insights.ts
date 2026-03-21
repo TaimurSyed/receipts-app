@@ -1,0 +1,58 @@
+import { insightCards } from "@/lib/mock-data";
+import { hasSupabaseEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
+
+export type InsightRecord = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  confidence: string;
+  evidence: string[];
+  createdAt?: string;
+};
+
+export async function getInsights(): Promise<InsightRecord[]> {
+  if (!hasSupabaseEnv()) {
+    return insightCards.map((card) => ({
+      id: card.id,
+      type: card.type,
+      title: card.title,
+      body: card.body,
+      confidence: card.confidence,
+      evidence: card.evidence,
+    }));
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("insights")
+    .select("id, type, title, body, confidence, evidence_entry_ids, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(12);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data.map((item) => ({
+    id: item.id,
+    type: item.type,
+    title: item.title,
+    body: item.body,
+    confidence: item.confidence,
+    evidence: Array.isArray(item.evidence_entry_ids)
+      ? item.evidence_entry_ids.filter((entryId): entryId is string => typeof entryId === "string")
+      : [],
+    createdAt: item.created_at,
+  }));
+}

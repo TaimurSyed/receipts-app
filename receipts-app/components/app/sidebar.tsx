@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { Activity, LayoutDashboard, NotebookPen, Sparkles, TimerReset } from "lucide-react";
 
 const items = [
-  { label: "Dashboard", icon: LayoutDashboard },
-  { label: "New entry", icon: NotebookPen },
-  { label: "Timeline", icon: TimerReset },
-  { label: "Insights", icon: Sparkles },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/app" },
+  { label: "New entry", icon: NotebookPen, href: "/app" },
+  { label: "Timeline", icon: TimerReset, href: "/app" },
+  { label: "Insights", icon: Sparkles, href: "/insights" },
 ];
 
 export function Sidebar() {
@@ -21,9 +22,10 @@ export function Sidebar() {
       </div>
 
       <nav className="mt-5 space-y-2">
-        {items.map(({ label, icon: Icon }, index) => (
-          <button
+        {items.map(({ label, icon: Icon, href }, index) => (
+          <Link
             key={label}
+            href={href}
             className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition ${
               index === 0
                 ? "bg-white text-black"
@@ -32,7 +34,7 @@ export function Sidebar() {
           >
             <Icon className="h-4 w-4" />
             {label}
-          </button>
+          </Link>
         ))}
       </nav>
     </aside>

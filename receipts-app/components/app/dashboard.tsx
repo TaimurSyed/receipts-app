@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AudioLines, BrainCircuit, Plus } from "lucide-react";
 import { EntryForm } from "@/components/app/entry-form";
 import { getEntries } from "@/lib/entries";
