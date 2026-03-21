@@ -26,10 +26,10 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: 0.06;
   background-image:
-    linear-gradient(rgba(255, 248, 235, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 248, 235, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255, 248, 235, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 248, 235, 0.025) 1px, transparent 1px);
   background-size: 100% 42px, 42px 100%;
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), transparent 85%);
 }
@@ -43,15 +43,27 @@ body::before {
 }
 
 .notebook-paper {
+  position: relative;
   background:
-    linear-gradient(180deg, rgba(255, 248, 235, 0.03), rgba(255, 248, 235, 0.01)),
+    linear-gradient(180deg, rgba(255, 248, 235, 0.035), rgba(255, 248, 235, 0.012)),
     repeating-linear-gradient(
       to bottom,
       transparent 0,
       transparent 33px,
-      rgba(255, 248, 235, 0.045) 34px,
+      rgba(255, 248, 235, 0.05) 34px,
       transparent 35px
     );
+}
+
+.notebook-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.04));
+  pointer-events: none;
 }
 
 .notebook-page-edge {
@@ -59,4 +71,16 @@ body::before {
     inset 0 1px 0 rgba(255, 248, 235, 0.06),
     inset 0 -1px 0 rgba(0, 0, 0, 0.22),
     0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+.notebook-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 248, 235, 0.018), rgba(255, 248, 235, 0.006)),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 35px,
+      rgba(255, 248, 235, 0.03) 36px,
+      transparent 37px
+    );
 }

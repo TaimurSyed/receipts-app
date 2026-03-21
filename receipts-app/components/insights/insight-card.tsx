@@ -21,7 +21,7 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
       className={
         isJournal
           ? "rounded-[2rem] bg-transparent"
-          : "rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/8 to-white/[0.03] p-6"
+          : "notebook-panel rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/8 to-white/[0.03] p-6"
       }
     >
       {!isJournal ? <p className="text-sm italic leading-6 text-zinc-500">{intros[insight.type] ?? "What your entries suggest:"}</p> : null}
@@ -50,7 +50,7 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
               }
 
               return (
-                <div key={entryId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <div key={entryId} className="notebook-panel rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-medium text-white">{evidence.archived ? "This note is archived" : evidence.title}</p>
                     <span className="text-xs text-zinc-500">{evidence.createdAt}</span>
