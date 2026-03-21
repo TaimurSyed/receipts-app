@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { AudioLines, BrainCircuit, Plus } from "lucide-react";
+import { BrainCircuit, Plus, Sparkles } from "lucide-react";
 import { EntryForm } from "@/components/app/entry-form";
-import { getEntries } from "@/lib/entries";
-import { insightCards } from "@/lib/mock-data";
+import { InsightCard } from "@/components/insights/insight-card";
+import { getDashboardData } from "@/lib/dashboard";
 
 function moodLabel(score: number) {
   return ["Very low", "Low", "Neutral", "Good", "Great"][score - 1] ?? "Unknown";
 }
 
 export async function Dashboard() {
-  const recentEntries = await getEntries();
+  const { entries: recentEntries, insights, dominantTheme } = await getDashboardData();
+  const latestInsights = insights.slice(0, 3);
 
   return (
     <section className="space-y-6">
@@ -21,19 +22,19 @@ export async function Dashboard() {
               Your week, under intelligent review.
             </h1>
             <p className="mt-3 max-w-2xl text-zinc-400">
-              Fast capture on one side, evidence-backed insight on the other. The app now supports a real server-side save path once Supabase keys are added.
+              Capture the raw material fast, then let Receipts turn it into patterns, contradictions, and receipts that feel specific enough to sting a little.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <button className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black">
+            <a href="#entry-form" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-black">
               <Plus className="h-4 w-4" />
               Add entry
-            </button>
-            <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
-              <AudioLines className="h-4 w-4" />
-              Upload voice note
-            </button>
+            </a>
+            <Link href="/insights" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
+              <Sparkles className="h-4 w-4" />
+              View insights
+            </Link>
           </div>
         </div>
       </div>
@@ -47,11 +48,11 @@ export async function Dashboard() {
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Signals found</p>
-              <p className="mt-4 text-3xl font-semibold text-white">{insightCards.length}</p>
+              <p className="mt-4 text-3xl font-semibold text-white">{insights.length}</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Mode</p>
-              <p className="mt-4 text-2xl font-semibold text-white">Hybrid mock/live</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Dominant theme</p>
+              <p className="mt-4 text-2xl font-semibold capitalize text-white">{dominantTheme}</p>
             </div>
           </div>
 
@@ -65,25 +66,21 @@ export async function Dashboard() {
             </div>
 
             <div className="mt-6 space-y-4">
-              {insightCards.map((card) => (
-                <article key={card.id} className="rounded-3xl border border-white/10 bg-black/20 p-5">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-amber-200">
-                      {card.type}
-                    </span>
-                    <span className="text-xs uppercase tracking-[0.18em] text-zinc-500">{card.confidence} confidence</span>
-                  </div>
-                  <h3 className="mt-4 text-xl font-semibold text-white">{card.title}</h3>
-                  <p className="mt-3 leading-7 text-zinc-400">{card.body}</p>
-                  <p className="mt-4 text-sm text-zinc-500">Evidence: {card.evidence.join(", ")}</p>
-                </article>
-              ))}
+              {latestInsights.length > 0 ? (
+                latestInsights.map((insight) => <InsightCard key={insight.id} insight={insight} />)
+              ) : (
+                <div className="rounded-3xl border border-white/10 bg-black/20 p-5 text-zinc-400">
+                  No saved insights yet. Add a few entries, then head to the insights page and generate them.
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <EntryForm />
+          <div id="entry-form">
+            <EntryForm />
+          </div>
 
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Recent timeline</p>

@@ -50,30 +50,48 @@ export async function generateInsights() {
     .select("id, title, content, mood_score, tags, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(12);
+    .limit(16);
 
   if (entryError || !entries || entries.length < 3) {
     return { ok: false, message: "Add at least 3 entries before generating insights." };
   }
 
   const client = createOpenAiClient();
-  const prompt = `You are generating concise self-insight cards for a journaling app.
-Based only on the evidence provided, create up to 3 insights: one pattern, one contradiction, and one weekly_receipt.
-Return JSON only with this shape:
+  const prompt = `You are the insight engine for a product called Receipts.
+Your job is to generate sharp, evidence-based observations from a user's own notes.
+
+STYLE RULES:
+- Sound perceptive, specific, and slightly forensic.
+- Do NOT sound like a therapist, life coach, or generic productivity blog.
+- Do NOT repeat the user's words unless needed for evidence.
+- Prefer concrete behavioral interpretation over vague emotional summaries.
+- If the evidence is weak, lower confidence instead of overclaiming.
+- Every insight must point to actual entries that support it.
+
+OUTPUT RULES:
+Return valid JSON only with this exact shape:
 {
   "insights": [
     {
       "type": "pattern | contradiction | weekly_receipt",
-      "title": "short title",
-      "body": "2-4 sentence explanation grounded in the evidence",
+      "title": "short sharp title",
+      "body": "2-4 sentences. Explain the pattern in a way that feels specific and useful.",
       "confidence": "low | medium | high",
-      "evidence_entry_ids": ["entry-id"]
+      "evidence_entry_ids": ["entry-id-1", "entry-id-2"]
     }
   ]
 }
-Do not use markdown fences. Do not include commentary outside JSON.
 
-Entries:\n${JSON.stringify(entries, null, 2)}`;
+QUALITY BAR:
+- A PATTERN should describe a repeated link between trigger and behavior.
+- A CONTRADICTION should highlight mismatch between what the user says and what their behavior suggests.
+- A WEEKLY_RECEIPT should summarize the strongest loop or pattern shaping the recent period.
+- Avoid generic lines like "stress affects productivity" unless the evidence is unusually strong and phrased specifically.
+- Use at most 3 insights total.
+- If a requested type is not supported by evidence, skip it.
+
+USER ENTRIES:
+${JSON.stringify(entries, null, 2)}`;
 
   let text = "";
 
@@ -108,7 +126,9 @@ Entries:\n${JSON.stringify(entries, null, 2)}`;
     };
   }
 
-  const insights = parsed.insights?.slice(0, 3) ?? [];
+  const insights = (parsed.insights ?? [])
+    .filter((insight) => insight.title && insight.body && insight.type && insight.confidence)
+    .slice(0, 3);
 
   if (insights.length === 0) {
     return { ok: false, message: "No insights were generated." };
