@@ -4,12 +4,22 @@ import { requireUser } from "@/lib/auth";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getEntries, getImagePlaybackUrl, getVoicePlaybackUrl } from "@/lib/entries";
 
-export default async function TimelinePage() {
+type TimelinePageProps = {
+  searchParams?: Promise<{ q?: string; type?: string; mood?: string; range?: string }>;
+};
+
+export default async function TimelinePage({ searchParams }: TimelinePageProps) {
   if (hasSupabaseEnv()) {
     await requireUser();
   }
 
-  const entries = await getEntries(50);
+  const params = (await searchParams) ?? {};
+  const query = params.q?.trim() ?? "";
+  const type = params.type?.trim() || "all";
+  const mood = params.mood?.trim() || "all";
+  const range = params.range?.trim() || "all";
+
+  const entries = await getEntries(50, { query, type, mood, range });
   const playbackUrls = Object.fromEntries(
     await Promise.all(entries.map(async (entry) => [entry.id, await getVoicePlaybackUrl(entry.audioPath)] as const)),
   );
@@ -20,9 +30,17 @@ export default async function TimelinePage() {
   return (
     <AppShell
       title="Timeline"
-      subtitle="Browse your recent notebook history in one place instead of pretending the dashboard is the timeline."
+      subtitle="Browse your notebook history, search old moments, and filter by how they were captured or how the period felt."
     >
-      <TimelineList entries={entries} playbackUrls={playbackUrls} imageUrls={imageUrls} />
+      <TimelineList
+        entries={entries}
+        playbackUrls={playbackUrls}
+        imageUrls={imageUrls}
+        query={query}
+        type={type}
+        mood={mood}
+        range={range}
+      />
     </AppShell>
   );
 }
