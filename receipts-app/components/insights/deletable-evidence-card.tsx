@@ -14,12 +14,10 @@ export function DeletableEvidenceCard({
   entryId,
   evidence,
   relatedHref,
-  stackClass,
 }: {
   entryId: string;
   evidence: EvidenceSnippet;
   relatedHref: string;
-  stackClass: string;
 }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -40,32 +38,34 @@ export function DeletableEvidenceCard({
   });
 
   return (
-    <div className={`delete-tear-target evidence-deck-card living-note ${stackClass} notebook-panel rounded-2xl border border-white/10 bg-white/[0.03] p-4 ${isDeleting ? "tear-delete" : ""}`}>
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-medium text-white">{evidence.archived ? "This note is archived" : evidence.title}</p>
-        <span className="text-xs text-zinc-500">{evidence.createdAt}</span>
-      </div>
-      <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence.content}</p>
+    <div className={`delete-tear-target border-l border-[#5a4b3f]/35 pl-4 sm:pl-5 ${isDeleting ? "tear-delete" : ""}`}>
+      <div className="rounded-[1.2rem] bg-white/[0.02] px-1 py-1">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="font-medium text-white">{evidence.archived ? "This note is archived" : evidence.title}</p>
+          <span className="text-xs text-zinc-500">{evidence.createdAt}</span>
+        </div>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence.content}</p>
 
-      {evidence.type === "voice" && evidence.audioUrl ? <VoicePlayback url={evidence.audioUrl} /> : null}
-      {evidence.type === "image" && evidence.imageUrl ? <ImageNote url={evidence.imageUrl} compact /> : null}
+        {evidence.type === "voice" && evidence.audioUrl ? <VoicePlayback url={evidence.audioUrl} /> : null}
+        {evidence.type === "image" && evidence.imageUrl ? <ImageNote url={evidence.imageUrl} compact /> : null}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link href={`/journal/${evidence.dateKey}`} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
-          Open day
-        </Link>
-        <Link href={relatedHref} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
-          See related entries
-        </Link>
-        {evidence.type ? (
-          <Link href={`/app/timeline?type=${encodeURIComponent(evidence.type)}`} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
-            More {evidence.type} notes
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Link href={`/journal/${evidence.dateKey}`} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
+            Open day
           </Link>
-        ) : null}
-      </div>
+          <Link href={relatedHref} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
+            See related entries
+          </Link>
+          {evidence.type ? (
+            <Link href={`/app/timeline?type=${encodeURIComponent(evidence.type)}`} className="rounded-full border border-[#5a4b3f] px-3 py-1 text-xs text-zinc-300 transition hover:bg-white/5">
+              More {evidence.type} notes
+            </Link>
+          ) : null}
+        </div>
 
-      <div className="mt-4">
-        <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} archived={evidence.archived} deleteTitle={deleteTitle} onDelete={handleDelete} deleting={isDeleting} />
+        <div className="mt-4">
+          <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} archived={evidence.archived} deleteTitle={deleteTitle} onDelete={handleDelete} deleting={isDeleting} />
+        </div>
       </div>
     </div>
   );

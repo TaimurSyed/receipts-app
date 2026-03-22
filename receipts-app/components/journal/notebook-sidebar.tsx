@@ -11,18 +11,25 @@ export function NotebookSidebar({ archive, selectedWeek, selectedDate }: Props) 
   return (
     <aside className="notebook-page-edge rounded-[2rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#17130f_0%,#100d0b_100%)] p-4 sm:rounded-[2.5rem] sm:p-5 lg:sticky lg:top-6">
       <div className="border-b border-[#5e503f]/40 pb-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Notebook</p>
-        <h2 className="mt-3 font-serif text-3xl text-[#f5ecd8]">Archive</h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-500">Years, months, weeks, and pages.</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">Notebook</p>
+            <h2 className="mt-3 font-serif text-3xl text-[#f5ecd8]">Archive</h2>
+            <p className="mt-2 text-sm leading-6 text-zinc-500">Years, months, weeks, and pages.</p>
+          </div>
+          <Link href="/journal/archive" className="inline-flex rounded-full border border-[#5a4b3f] bg-white/5 px-4 py-2 text-sm text-zinc-300 transition hover:bg-white/10 lg:hidden">
+            Archived notes
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 hidden lg:block">
         <Link href="/journal/archive" className="block rounded-2xl border border-[#5a4b3f] bg-white/5 px-4 py-3 text-sm text-zinc-300 transition hover:bg-white/10">
           Archived notes
         </Link>
       </div>
 
-      <div className="mt-5 space-y-5 max-h-[50vh] overflow-auto pr-1 sm:max-h-[60vh] lg:max-h-[75vh]">
+      <div className="mt-5 space-y-5 max-h-[42vh] overflow-auto pr-1 sm:max-h-[52vh] lg:max-h-[75vh]">
         {archive.length > 0 ? (
           archive.map((yearGroup) => (
             <div key={yearGroup.year} className="space-y-3">

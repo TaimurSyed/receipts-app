@@ -7,6 +7,7 @@ export type PageAnnotation = {
   pageKey: string;
   body: string;
   createdAt: string;
+  createdAtRaw: string;
   author: "user" | "ai";
   replyTo?: string | null;
 };
@@ -36,6 +37,7 @@ export async function getAnnotations(pageType: "week" | "day", pageKey: string):
     pageType: item.page_type,
     pageKey: item.page_key,
     body: item.body,
+    createdAtRaw: item.created_at,
     createdAt: new Date(item.created_at).toLocaleString("en-US", {
       month: "short",
       day: "numeric",

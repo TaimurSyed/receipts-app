@@ -18,16 +18,16 @@ export function AppShell({
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts app</p>
+          <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts journal</p>
           <h1 className="mt-2 text-2xl font-semibold text-white">{title}</h1>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">{subtitle}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">{subtitle}</p>
         </div>
         <SignOutButton />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid gap-5 lg:grid-cols-[280px_1fr] lg:gap-6">
         <Sidebar />
-        {children}
+        <div className="min-w-0">{children}</div>
       </div>
     </main>
   );

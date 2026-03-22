@@ -101,8 +101,8 @@ export function TimelineList({
         </div>
       ) : null}
 
-      <form className="mt-6 grid gap-x-4 gap-y-4 rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(0,1fr)_160px_160px_160px_170px_auto] 2xl:items-end">
-        <div className="min-w-0 space-y-2 md:col-span-2 xl:col-span-3 2xl:col-span-1">
+      <form className="mt-6 grid gap-4 rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-4 lg:grid-cols-2 xl:grid-cols-12 xl:gap-5">
+        <div className="min-w-0 space-y-2 lg:col-span-2 xl:col-span-5">
           <label htmlFor="timeline-search" className="block text-[10px] uppercase leading-5 tracking-[0.14em] text-zinc-500">
             Search the notebook
           </label>
@@ -115,7 +115,7 @@ export function TimelineList({
           />
         </div>
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2 xl:col-span-2">
           <label htmlFor="timeline-type" className="block text-[10px] uppercase leading-5 tracking-[0.14em] text-zinc-500">
             Entry type
           </label>
@@ -126,7 +126,7 @@ export function TimelineList({
           </select>
         </div>
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2 xl:col-span-2">
           <label htmlFor="timeline-mood" className="block text-[10px] uppercase leading-5 tracking-[0.14em] text-zinc-500">
             Mood band
           </label>
@@ -137,7 +137,7 @@ export function TimelineList({
           </select>
         </div>
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2 xl:col-span-2">
           <label htmlFor="timeline-range" className="block text-[10px] uppercase leading-5 tracking-[0.14em] text-zinc-500">
             Time range
           </label>
@@ -148,7 +148,7 @@ export function TimelineList({
           </select>
         </div>
 
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2 xl:col-span-3">
           <label htmlFor="timeline-archived" className="block text-[10px] uppercase leading-5 tracking-[0.14em] text-zinc-500">
             Notebook state
           </label>
@@ -159,7 +159,7 @@ export function TimelineList({
           </select>
         </div>
 
-        <div className="flex flex-wrap gap-2 md:col-span-2 xl:col-span-3 2xl:col-span-1 2xl:justify-end">
+        <div className="flex flex-wrap gap-2 pt-1 lg:col-span-2 xl:col-span-12 xl:justify-end">
           {relatedTo ? <input type="hidden" name="relatedTo" value={relatedTo} /> : null}
           <button className="rounded-full bg-amber-300 px-5 py-3 font-semibold text-black">Search</button>
           {hasFilters ? (

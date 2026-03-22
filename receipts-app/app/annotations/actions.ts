@@ -47,6 +47,7 @@ export async function createAnnotation(
   const pageType = String(formData.get("pageType") || "") as "week" | "day";
   const pageKey = String(formData.get("pageKey") || "").trim();
   const body = String(formData.get("body") || "").trim();
+  const replyTo = String(formData.get("replyTo") || "").trim() || null;
 
   if (!pageType || !pageKey || !body) {
     return { ok: false, message: "Write something before saving your note." };
@@ -69,6 +70,7 @@ export async function createAnnotation(
       page_key: pageKey,
       body,
       author: "user",
+      reply_to: replyTo,
     })
     .select("id")
     .single();
