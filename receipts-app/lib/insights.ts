@@ -21,7 +21,30 @@ export type EvidenceSnippet = {
   createdAt: string;
   dateKey: string;
   archived?: boolean;
+  type?: string;
+  searchSeed?: string;
+  audioPath?: string | null;
+  imagePath?: string | null;
+  audioUrl?: string | null;
+  imageUrl?: string | null;
 };
+
+async function getSignedMediaUrls(supabase: Awaited<ReturnType<typeof createClient>>, audioPath?: string | null, imagePath?: string | null) {
+  let audioUrl: string | null = null;
+  let imageUrl: string | null = null;
+
+  if (audioPath) {
+    const { data } = await supabase.storage.from("voice-memos").createSignedUrl(audioPath, 60 * 10);
+    audioUrl = data?.signedUrl ?? null;
+  }
+
+  if (imagePath) {
+    const { data } = await supabase.storage.from("image-notes").createSignedUrl(imagePath, 60 * 10);
+    imageUrl = data?.signedUrl ?? null;
+  }
+
+  return { audioUrl, imageUrl };
+}
 
 export async function getInsights(): Promise<InsightRecord[]> {
   if (!hasSupabaseEnv()) {
@@ -89,29 +112,43 @@ export async function getEvidenceSnippets(entryIds: string[]): Promise<Record<st
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("entries")
-    .select("id, title, content, created_at, archived")
+    .select("id, title, content, created_at, archived, type, tags, audio_path, image_path")
     .in("id", entryIds);
 
   if (error || !data) {
     return {};
   }
 
-  return Object.fromEntries(
-    data.map((entry) => [
-      entry.id,
-      {
-        id: entry.id,
-        title: entry.title || "Untitled entry",
-        content: entry.archived ? "This note is archived and hidden from the active notebook." : entry.content,
-        createdAt: new Date(entry.created_at).toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        }),
-        dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
-        archived: entry.archived ?? false,
-      },
-    ]),
+  const entriesWithUrls = await Promise.all(
+    data.map(async (entry) => {
+      const tags = Array.isArray(entry.tags) ? entry.tags.filter((tag): tag is string => typeof tag === "string") : [];
+      const searchSeed = tags[0] || entry.title || entry.content.slice(0, 32);
+      const { audioUrl, imageUrl } = await getSignedMediaUrls(supabase, entry.audio_path, entry.image_path);
+
+      return [
+        entry.id,
+        {
+          id: entry.id,
+          title: entry.title || "Untitled entry",
+          content: entry.archived ? "This note is archived and hidden from the active notebook." : entry.content,
+          createdAt: new Date(entry.created_at).toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          }),
+          dateKey: new Date(entry.created_at).toISOString().slice(0, 10),
+          archived: entry.archived ?? false,
+          type: entry.type ?? "text",
+          searchSeed,
+          audioPath: entry.audio_path ?? null,
+          imagePath: entry.image_path ?? null,
+          audioUrl,
+          imageUrl,
+        },
+      ] as const;
+    }),
   );
+
+  return Object.fromEntries(entriesWithUrls);
 }

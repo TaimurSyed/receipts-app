@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BrainCircuit, Sparkles } from "lucide-react";
 import { CaptureHub } from "@/components/app/capture-hub";
-import { TimelineList } from "@/components/app/timeline-list";
+import { RecentNotesPreview } from "@/components/app/recent-notes-preview";
 import { InsightCard } from "@/components/insights/insight-card";
 import { getDashboardData } from "@/lib/dashboard";
 import { getEvidenceSnippets } from "@/lib/insights";
@@ -49,11 +49,11 @@ export async function Dashboard() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="space-y-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] xl:items-start">
+        <div className="space-y-6 xl:min-w-0">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5">
             <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Current read</p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
               <div className="rounded-2xl border border-[#4f4338] bg-[#15120f]/80 p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Entries visible</p>
                 <p className="mt-3 text-3xl font-semibold text-white">{recentEntries.length}</p>
@@ -72,7 +72,7 @@ export async function Dashboard() {
           <CaptureHub />
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 xl:min-w-0">
           <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
@@ -93,7 +93,7 @@ export async function Dashboard() {
             </div>
           </div>
 
-          <TimelineList entries={recentEntries} playbackUrls={playbackUrls} imageUrls={imageUrls} />
+          <RecentNotesPreview entries={recentEntries} playbackUrls={playbackUrls} imageUrls={imageUrls} />
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { ManageNoteMenu } from "@/components/insights/manage-note-menu";
+import { DeletableEvidenceCard } from "@/components/insights/deletable-evidence-card";
 import type { EvidenceSnippet, InsightRecord } from "@/lib/insights";
 
 type InsightCardProps = {
@@ -21,7 +21,7 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
       className={
         isJournal
           ? "rounded-[2rem] bg-transparent"
-          : "notebook-panel rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/8 to-white/[0.03] p-6"
+          : "living-note note-stack-b notebook-panel w-full rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/8 to-white/[0.03] p-6"
       }
     >
       {!isJournal ? <p className="text-sm italic leading-6 text-zinc-500">{intros[insight.type] ?? "What your entries suggest:"}</p> : null}
@@ -32,32 +32,36 @@ export function InsightCard({ insight, evidenceMap, variant = "note" }: InsightC
         {insight.body}
       </p>
 
-      <details className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
+      <details className="receipt-reveal mt-6 rounded-2xl border border-white/10 bg-black/20 p-4">
         <summary className="cursor-pointer list-none text-sm font-medium text-zinc-300">
           Open the receipts underneath
         </summary>
         <div className="mt-4 space-y-3">
           {insight.evidence.length > 0 ? (
-            insight.evidence.map((entryId) => {
+            insight.evidence.map((entryId, index) => {
               const evidence = evidenceMap?.[entryId];
               if (!evidence) {
                 return (
                   <div key={entryId} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                    <p className="font-medium text-white">Linked note unavailable</p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-400">This linked note could not be loaded.</p>
+                    <p className="font-medium text-white">This note was deleted after the insight was generated</p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-400">
+                      The insight still remembers that something mattered here, but the original note is gone now.
+                    </p>
                   </div>
                 );
               }
 
+              const relatedHref = `/app/timeline?relatedTo=${encodeURIComponent(entryId)}`;
+              const stackClass = index % 3 === 0 ? "note-stack-a" : index % 3 === 1 ? "note-stack-b" : "note-stack-c";
+
               return (
-                <div key={entryId} className="notebook-panel rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-medium text-white">{evidence.archived ? "This note is archived" : evidence.title}</p>
-                    <span className="text-xs text-zinc-500">{evidence.createdAt}</span>
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-zinc-400">{evidence.content}</p>
-                  <ManageNoteMenu entryId={entryId} dateKey={evidence.dateKey} archived={evidence.archived} />
-                </div>
+                <DeletableEvidenceCard
+                  key={entryId}
+                  entryId={entryId}
+                  evidence={evidence}
+                  relatedHref={relatedHref}
+                  stackClass={stackClass}
+                />
               );
             })
           ) : (

@@ -53,7 +53,10 @@ function endOfWeek(date: Date) {
 }
 
 function formatDate(date: Date) {
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function formatRangeLabel(start: Date, end: Date) {
@@ -190,8 +193,8 @@ export function getMonthInsights(insights: InsightRecord[], monthKey?: string) {
 }
 
 export function buildMonthGrid(month: JournalMonth): MonthGridCell[] {
-  const firstDay = new Date(Date.UTC(month.year, month.month, 1));
-  const lastDay = new Date(Date.UTC(month.year, month.month + 1, 0));
+  const firstDay = new Date(month.year, month.month, 1);
+  const lastDay = new Date(month.year, month.month + 1, 0);
   const gridStart = startOfWeek(firstDay);
   const gridEnd = endOfWeek(lastDay);
   const datesWithEntries = new Set(month.weeks.flatMap((week) => week.days.map((day) => day.date)));
@@ -203,11 +206,11 @@ export function buildMonthGrid(month: JournalMonth): MonthGridCell[] {
     const date = formatDate(cursor);
     cells.push({
       date,
-      dayNumber: cursor.getUTCDate(),
-      inMonth: cursor.getUTCMonth() === month.month,
+      dayNumber: cursor.getDate(),
+      inMonth: cursor.getMonth() === month.month,
       hasEntries: datesWithEntries.has(date),
     });
-    cursor.setUTCDate(cursor.getUTCDate() + 1);
+    cursor.setDate(cursor.getDate() + 1);
   }
 
   return cells;

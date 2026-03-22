@@ -14,6 +14,28 @@ async function ensureUser() {
   return { ok: true as const, supabase, user };
 }
 
+async function pruneDeletedEntryFromInsights(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, entryId: string) {
+  const { data: insights, error } = await supabase
+    .from("insights")
+    .select("id, evidence_entry_ids")
+    .eq("user_id", userId)
+    .contains("evidence_entry_ids", [entryId]);
+
+  if (error || !insights?.length) return;
+
+  for (const insight of insights) {
+    const nextEvidence = Array.isArray(insight.evidence_entry_ids)
+      ? insight.evidence_entry_ids.filter((value): value is string => typeof value === "string" && value !== entryId)
+      : [];
+
+    await supabase
+      .from("insights")
+      .update({ evidence_entry_ids: nextEvidence })
+      .eq("id", insight.id)
+      .eq("user_id", userId);
+  }
+}
+
 export async function archiveEntry(entryId: string, date: string) {
   const auth = await ensureUser();
   if (!auth.ok) return auth;
@@ -57,6 +79,8 @@ export async function restoreEntry(entryId: string, date: string) {
 export async function deleteEntry(entryId: string, date: string) {
   const auth = await ensureUser();
   if (!auth.ok) return auth;
+
+  await pruneDeletedEntryFromInsights(auth.supabase, auth.user.id, entryId);
 
   const { error } = await auth.supabase
     .from("entries")

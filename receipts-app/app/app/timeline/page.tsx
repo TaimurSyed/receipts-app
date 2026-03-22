@@ -5,7 +5,7 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { getEntries, getImagePlaybackUrl, getVoicePlaybackUrl } from "@/lib/entries";
 
 type TimelinePageProps = {
-  searchParams?: Promise<{ q?: string; type?: string; mood?: string; range?: string }>;
+  searchParams?: Promise<{ q?: string; type?: string; mood?: string; range?: string; archived?: string; relatedTo?: string }>;
 };
 
 export default async function TimelinePage({ searchParams }: TimelinePageProps) {
@@ -18,8 +18,10 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   const type = params.type?.trim() || "all";
   const mood = params.mood?.trim() || "all";
   const range = params.range?.trim() || "all";
+  const archived = params.archived?.trim() || "active";
+  const relatedTo = params.relatedTo?.trim() || "";
 
-  const entries = await getEntries(50, { query, type, mood, range });
+  const entries = await getEntries(50, { query, type, mood, range, archived, relatedTo });
   const playbackUrls = Object.fromEntries(
     await Promise.all(entries.map(async (entry) => [entry.id, await getVoicePlaybackUrl(entry.audioPath)] as const)),
   );
@@ -30,7 +32,9 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   return (
     <AppShell
       title="Timeline"
-      subtitle="Browse your notebook history, search old moments, and filter by how they were captured or how the period felt."
+      subtitle={relatedTo
+        ? "These notes are ranked by how closely they connect to the one you came from."
+        : "Browse your notebook history, search old moments, and filter by how they were captured or how the period felt."}
     >
       <TimelineList
         entries={entries}
@@ -40,6 +44,8 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
         type={type}
         mood={mood}
         range={range}
+        archived={archived}
+        relatedTo={relatedTo}
       />
     </AppShell>
   );

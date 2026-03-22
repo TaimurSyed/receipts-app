@@ -4,6 +4,7 @@ import { GenerateInsightsButton } from "@/components/insights/generate-insights-
 import { InsightCard } from "@/components/insights/insight-card";
 import { MonthSelector } from "@/components/insights/month-selector";
 import { ScopeSwitcher } from "@/components/insights/scope-switcher";
+import { SupportingNotesDeck } from "@/components/insights/supporting-notes-deck";
 import { TonePicker } from "@/components/insights/tone-picker";
 import { NotebookShell } from "@/components/journal/notebook-shell";
 import { PageNav } from "@/components/navigation/page-nav";
@@ -51,7 +52,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
         items={[
           { label: "App", href: "/app" },
           { label: "Journal", href: "/insights" },
-          { label: scope === "month" ? activeMonth?.label ?? "Month" : activeWeek?.label ?? "Week" },
+          { label: scope === "month" ? "Month" : "Week" },
         ]}
       />
 
@@ -102,7 +103,7 @@ export default async function InsightsPage({ searchParams }: PageProps) {
               : "No weekly read yet. Give it a few real notes — moments, moods, contradictions, the small stuff you usually hand-wave away — and this page will start sounding like it knows you."}
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
+          <div className="space-y-6">
             <section className="space-y-6 rounded-[2.6rem] border border-[#4a3c2f] bg-[linear-gradient(180deg,#1a1612_0%,#11100f_100%)] p-6 sm:p-10">
               <div className="border-b border-[#5e503f]/40 pb-6">
                 <p className="text-xs uppercase tracking-[0.3em] text-[#dbc59b]">{scope === "month" ? "Monthly page" : "Weekly page"}</p>
@@ -126,20 +127,9 @@ export default async function InsightsPage({ searchParams }: PageProps) {
               ) : null}
             </section>
 
-            <aside className="space-y-5">
-              <div className="rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-5">
-                <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Margin notes</p>
-                <h3 className="mt-2 font-serif text-2xl text-[#f1e7d4]">Other things your behavior was saying</h3>
-              </div>
-
-              {sideNotes.length > 0 ? (
-                sideNotes.map((insight) => <InsightCard key={insight.id} insight={insight} evidenceMap={evidenceMap} />)
-              ) : (
-                <div className="rounded-[2rem] border border-[#4f4338] bg-[#15120f]/80 p-6 text-zinc-400">
-                  Nothing else strong enough to surface yet. That is fine — this notebook should be selective, not chatty.
-                </div>
-              )}
-            </aside>
+            <section className="space-y-5 rounded-[2.3rem] border border-[#4f4338] bg-[#15120f]/70 p-5 sm:p-6">
+              <SupportingNotesDeck notes={sideNotes} evidenceMap={evidenceMap} />
+            </section>
           </div>
         )}
       </div>
