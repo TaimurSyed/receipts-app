@@ -13,10 +13,10 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <PageNav items={[{ label: "App", href: "/app" }, { label: title }]} />
 
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Receipts app</p>
           <h1 className="mt-2 text-2xl font-semibold text-white">{title}</h1>

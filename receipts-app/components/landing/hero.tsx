@@ -23,8 +23,8 @@ const proofCards = [
 export function Hero() {
   return (
     <section className="relative overflow-hidden border-b border-white/10">
-      <div className="mx-auto max-w-7xl px-6 pt-6 lg:px-8">
-        <div className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+        <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:rounded-full">
           <div className="flex items-center gap-3">
             <div className="h-2.5 w-2.5 rounded-full bg-amber-300" />
             <p className="text-sm font-medium text-white">Receipts</p>
@@ -46,7 +46,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-24">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:gap-10 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 lg:px-8 lg:py-24">
         <div className="space-y-8">
           <div className="flex flex-wrap gap-3">
             <Chip label="Forensic self-insight" />
@@ -54,10 +54,10 @@ export function Hero() {
           </div>
 
           <div className="space-y-6">
-            <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
               Your behavior leaves a trail. <span className="text-amber-300">Receipts</span> helps you read it.
             </h1>
-            <p className="max-w-2xl text-lg leading-8 text-zinc-400 sm:text-xl">
+            <p className="max-w-2xl text-base leading-7 text-zinc-400 sm:text-xl sm:leading-8">
               Drop in notes, moods, voice memos, and life chaos. Receipts finds the patterns,
               contradictions, and loops shaping who you’re becoming.
             </p>

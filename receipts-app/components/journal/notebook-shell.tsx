@@ -14,7 +14,7 @@ export function NotebookShell({
   children: ReactNode;
 }) {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="grid gap-6 lg:grid-cols-[320px_1fr] lg:items-start">
         <NotebookSidebar archive={archive} selectedWeek={selectedWeek} selectedDate={selectedDate} />
         <div className="relative">{children}</div>

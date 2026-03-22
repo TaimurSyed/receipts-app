@@ -17,8 +17,8 @@ export function TimelineList({
   imageUrls?: Record<string, string | null>;
 }) {
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-      <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Timeline</p>
           <h2 className="mt-2 font-serif text-3xl text-[#f5ecd8]">Recent pages and notes</h2>
@@ -35,7 +35,7 @@ export function TimelineList({
           const imageUrl = imageUrls[entry.id];
           return (
             <article key={entry.id} className="rounded-[1.8rem] border border-[#4f4338] bg-[#15120f]/85 p-5">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-[#f1e7d4]">{entry.title}</h3>
                   <p className="mt-1 text-sm text-zinc-500">{entry.time}</p>

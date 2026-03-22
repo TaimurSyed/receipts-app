@@ -17,7 +17,7 @@ const points = [
 
 export function ProblemSolution() {
   return (
-    <section id="product" className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+    <section id="product" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
       <SectionHeading
         eyebrow="Why this exists"
         title="Not a journal. Not a therapist. Not another dashboard."

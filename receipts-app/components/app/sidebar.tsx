@@ -10,7 +10,7 @@ const items = [
 
 export function Sidebar() {
   return (
-    <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-5">
+    <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-4 sm:p-5">
       <div className="flex items-center gap-3 border-b border-white/10 pb-5">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-300 text-black">
           <Activity className="h-5 w-5" />
@@ -21,7 +21,7 @@ export function Sidebar() {
         </div>
       </div>
 
-      <nav className="mt-5 space-y-2">
+      <nav className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
         {items.map(({ label, icon: Icon, href }) => (
           <Link
             key={label}

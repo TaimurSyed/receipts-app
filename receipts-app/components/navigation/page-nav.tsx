@@ -14,7 +14,7 @@ export function PageNav({
   const router = useRouter();
 
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
+    <div className="mb-5 flex flex-col gap-3 text-sm sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center">
       {showBack ? (
         <button
           onClick={() => router.back()}
@@ -25,7 +25,7 @@ export function PageNav({
         </button>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2 text-zinc-500">
+      <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-1 text-zinc-500 sm:overflow-visible sm:pb-0">
         {items.map((item, index) => (
           <span key={`${item.label}-${index}`} className="flex items-center gap-2">
             {item.href ? (
